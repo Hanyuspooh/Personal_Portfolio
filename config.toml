@@ -1,5 +1,5 @@
 # Site settings
-baseURL = "http://ferrarisucks.netlify.app/"
+baseURL = "http://Personal_Portfolio.netlify.app/"
 languageCode = "en-us"
 title = "Portfolio Website for Zhiyan Chen"
 theme = "forty"

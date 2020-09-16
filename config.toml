@@ -94,14 +94,14 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "Academics"
       subtitle = "ESSEC BBA dissertation on crptocurrency's volatility"
-      image = "pic01.jpg"
-      url = "blogs/aliquam"
+      image = "pic011.jpg"
+      url = "blogs/blog6"
 
     [[params.tiles.showcase]]
-      title = "Analytics Projects"
-      subtitle = "Ross Datathon: 2019 American water resources studies"
+      title = "TFL sharing bikes: 2015 - 2020"
+      subtitle = "How does the pandemic affect rental income of sharing bikes in London?"
       image = "pic02.jpg"
-      url = "http://Hanyuspooh/Datathon2019_Umich_Zhiyan"
+      url = "blogs/blog2"
 
     [[params.tiles.showcase]]
       title = "TFL bike sharing"

@@ -8,7 +8,7 @@ description: A skim at TFL sharing bike service in London before and after the p
 draft: false
 image: pic09.jpg
 keywords: ""
-slug: magna
+slug: blog2
 title: TFL bike sharing
 ---
 

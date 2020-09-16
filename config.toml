@@ -92,9 +92,9 @@ disqusShortname = ""
     # Display your showcases here.
     
     [[params.tiles.showcase]]
-      title = "Academics"
-      subtitle = "ESSEC BBA dissertation on crptocurrency's volatility"
-      image = "pic11.jpg"
+      title = "Mask Acceptance in the U.S"
+      subtitle = "Do people accept mask wearing as their routine during the pandemic in the States?"
+      image = "plot_choropleths-5.png"
       url = "blogs/blog5"
 
     [[params.tiles.showcase]]
@@ -104,8 +104,8 @@ disqusShortname = ""
       url = "blogs/blog6"
 
     [[params.tiles.showcase]]
-      title = "TFL bike sharing"
-      subtitle = "TFL bike sharing"
+      title = "Titanic Survival Prediction"
+      subtitle = "Will a passenger on Titanic live or die? Let's find out using their data."
       image = "pic03.jpg"
       url = "blogs/blog7"
 

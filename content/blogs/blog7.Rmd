@@ -1,5 +1,5 @@
 ---
-title: "Logistics Regression Class Exercise"
+title: "Logistics Regression for Titanic Survival Prediction"
 author: "Zhiyan Chen"
 date: "Mar 13, 2019"
 output: html_document
@@ -22,7 +22,7 @@ You should import TitanicTrain.csv data. Check the structure of the data using s
 - Parch: Number of Parents/Children aboard
 - Are there variables that are not in the right class? If yes then convert those variables to the correct class
 
-```{r}
+```{r,message=FALSE,warning=FALSE,echo=FALSE}
 library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
 library(janitor)
 library(vroom)
@@ -34,7 +34,7 @@ TitanicTrain <- read_csv(here::here("data","TitanicTrain.csv"))
 
 
 ```{r}
-str(TitanicTrain)
+#str(TitanicTrain)
 TitanicTrain$Name <- NULL
 TitanicTrain$Ticket <- NULL
 head(TitanicTrain)
@@ -205,8 +205,7 @@ Enter here the following:
 2. Your Kaggle Rank: 4885
 3. What did you learn in this exercise? Summarize your experience. What can you do better given more time?
 
-I learnt to make links between models and real-life implications and findings, so that to understand the models better and to be able to improve them. I also learnt how to optimize logistic models and linear models. I LOVED the competition, it gives me a sense of accomplishment.
+I learnt to make links between models and real-life implications and findings, so that to understand the models better and to be able to improve them. I also learnt how to optimize logistic models and linear models. I LOVED the competition, it gives me sense of accomplishment.
 ```
 
 
-> When you are done, submit you files (RMD and HTML) to Canvas for our weekly homework. Also submit you Kaggle rank and username. Lets see who in class gets the best rank on Kaggle.

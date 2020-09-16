@@ -1,14 +1,16 @@
+
 ---
-    
-date: "2020-09-08"
+categories:
+- ""
+- ""
+date: "2020-09-16"
 description: Is mask acceptance high in the U.S during the Covid19 pandemic? --NYT Survey Analysis
 draft: false
-image: pic07.jpg
+image: pic01.jpg
 keywords: ""
 slug: blog5
-title: Mask Acceptance
+title: Mask Acceptance in the U.S
 ---
-
 
 
 ```{r, setup, echo=FALSE}
@@ -49,9 +51,8 @@ Github source for data https://github.com/nytimes/covid-19-data/tree/master/mask
 ## Getting the data 
 
 ```{r, read_data}
-Sourcefordataurl <- "https://github.com/nytimes/covid-19-data/raw/master/mask-use/mask-use-by-county.csv"
 
-nyt_mask_survey <- read_csv(Sourcefordataurl)
+nyt_mask_survey <- read_csv(here::here("data","nyt_mask_survey.csv"))
 
 nyt_mask_survey <- nyt_mask_survey %>%
   clean_names() %>% 

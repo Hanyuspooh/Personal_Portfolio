@@ -7,7 +7,7 @@ description: ""
 draft: false
 image: pic11.jpg
 keywords: ""
-slug: blog6
-title: BBA Dissertation: Bitcoin's volatility
+slug: magna
+title: magna
 ---
 

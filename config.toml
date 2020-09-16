@@ -94,32 +94,32 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "Academics"
       subtitle = "ESSEC BBA dissertation on crptocurrency's volatility"
-      image = "pic011.jpg"
-      url = "blogs/blog6"
+      image = "pic11.jpg"
+      url = "blogs/blog5"
 
     [[params.tiles.showcase]]
       title = "TFL sharing bikes: 2015 - 2020"
       subtitle = "How does the pandemic affect rental income of sharing bikes in London?"
       image = "pic02.jpg"
-      url = "blogs/blog2"
+      url = "blogs/blog6"
 
     [[params.tiles.showcase]]
       title = "TFL bike sharing"
       subtitle = "TFL bike sharing"
       image = "pic03.jpg"
-      url = "blogs/magna"
+      url = "blogs/blog7"
 
     [[params.tiles.showcase]]
       title = "Ipsum"
       subtitle = "Nisl Sed Aliquam"
       image = "pic04.jpg"
-      url = "blogs/blog5"
+      url = "blogs/blog8"
 
-    [[params.tiles.showcase]]
-      title = "Consequat"
-      subtitle = "Ipsum Dolor Sit Amet"
-      image = "pic05.jpg"
-      url = "blogs/ipsum"
+   # [[params.tiles.showcase]]
+  #    title = "Consequat"
+  #    subtitle = "Ipsum Dolor Sit Amet"
+  #    image = "pic05.jpg"
+  #    url = "blogs/ipsum"
 
    # [[params.tiles.showcase]]
     #  title = "Etiam"

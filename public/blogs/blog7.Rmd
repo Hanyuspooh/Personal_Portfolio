@@ -1,0 +1,212 @@
+---
+title: "Logistics Regression Class Exercise"
+author: "Zhiyan Chen"
+date: "Mar 13, 2019"
+output: html_document
+---
+
+> We will do small exercise in Logistic Regression today. This will also become your submission for the day. We will do this work today in groups of two (or 3 in case of need). This will later also become your submission for the next homework. For the class submission, only one submission per team is needed - mention in comments (and in author field above) who all worked on it together.
+
+
+## Titanic Survival Model
+
+We want to find out what factors affected passengers' survival when Titanic sank. As survival is a binary measure, this task is well suited for a Logistic Regression analysis.
+
+### Task A: Load and Explore the Data
+
+Training Data (data for building our model) is saved in the file TitanicTrain.csv
+
+You should import TitanicTrain.csv data. Check the structure of the data using str() function.
+
+- PClass: Passenger Class, Sibsp: Number of Siblings/Spouse aboard
+- Parch: Number of Parents/Children aboard
+- Are there variables that are not in the right class? If yes then convert those variables to the correct class
+
+```{r}
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(janitor)
+library(vroom)
+library(mosaic)
+library(here)
+TitanicTrain <- read_csv(here::here("data","TitanicTrain.csv"))
+
+```
+
+
+```{r}
+str(TitanicTrain)
+TitanicTrain$Name <- NULL
+TitanicTrain$Ticket <- NULL
+head(TitanicTrain)
+TitanicTrain$Pclass <- as.factor(TitanicTrain$Pclass)
+
+```
+
+###Survival rate
+```{r}
+sum(TitanicTrain$Survived)/891
+```
+
+###Originally using the mean to replace the NA's. As in Part C we are going to use linear models to replace NA's, the NA's are kept as they are for here.
+```{r}
+#mean(TitanicTrain$Age, na.rm=TRUE)
+#TitanicTrain$Age <- ifelse(is.na(TitanicTrain$Age)==T, mean(TitanicTrain$Age, na.rm=T), TitanicTrain$Age)
+#TitanicTrain$Age[is.na(TitanicTrain$age)] <- mean(TitanicTrain$Age, na.rm=T)
+
+summary(TitanicTrain$Age)
+```
+
+##### Or to build a lm
+
+### Task B: Build Our Model
+
+Build a logistic regression model with Survival as the response variable. In this section, let's first build a main effects model. What variables do you need to include as the predictor variables?
+
+```{r}
+logit.model <- glm(Survived ~ Sex + Age + Pclass, data = TitanicTrain, family = "binomial")
+summary(logit.model)
+```
+
+###Being male in different classes
+
+```{r}
+model <- glm(Survived ~ Sex * Pclass, data = TitanicTrain, family = "binomial")
+summary(model)
+```
+### Males in 3rd class were not classic gentlemen as males in 1st in the sense that they didn't give seats to the females and cared more about themselves.
+
+```{r}
+model3 <- glm(Survived ~ SibSp * Sex , data = TitanicTrain, family = "binomial")
+summary(model3)
+```
+### If you had to have siblings, you'd better to be a male to have a higher chance of surviving.
+
+```{r}
+model4 <- glm(Survived ~ Sex + Age + Pclass + SibSp + Parch * Sex, data = TitanicTrain, family = "binomial")
+summary(model4)
+```
+###If you were travelling with a child, then your chance for living would be greater if you were a male than being a female.
+
+Builging a model is always only the first step. The more important task is **interpreting** the model - what insights does your model give you?
+
+```{}
+In conclusion, we can see that largely, Sex, Pclass, Age, SibSp are significantly influencing the chance of survival. There are also some factors that combinedly affect the survivalship.
+```
+
+### Task C: Improve Our Model
+
+> We will likely not be able to do this during the class exercise. This task is for you to do as your homework. 
+
+How can we improve our model. There are several things you can try:
+
+- Do we need any interaction effects?
+- Do any of the variables have non-linear effects - should we include them in the model as a square term?
+- Can we clean the data better? Can we **infer** the missing values rather than losing all that information?
+
+Pay specific attention to how will you compare whether any particular model is **better** than other models. Potential choices are looking at the AIC value and ANOVA test for nested models.
+###Getting in the ages
+```{r}
+agemodel <- lm(Age ~ Pclass + Sex + SibSp, data=TitanicTrain)
+summary(agemodel)
+#Tried with every variable, that Parch and Fare are not significant.
+```
+###Predicting the ages in Train
+```{r}
+range(predict(agemodel, newdata=TitanicTrain))
+
+TitanicTrain$Age <- ifelse(is.na(TitanicTrain$Age)==TRUE, predict(agemodel, newdata=TitanicTrain), TitanicTrain$Age)
+
+summary(TitanicTrain$Age)
+```
+###Build the model again with ages
+
+```{r}
+model4 <- glm(Survived ~ Sex + Age + Pclass + SibSp + Parch * Sex, data = TitanicTrain, family = "binomial")
+summary(model4)
+```
+
+What is your best model? Explain your best model - what are you seeing as significant? What is the interpretation? What does it mean?
+
+```{}
+After trials and errors, adding new variable combinations and deleting insignificant variables, I come up with this model4, which has a relatively lower AIC of 796.62. It tells us that males have less chance of survival compared to females, and so is the elderly, the class 2 and 3 passengers, people with siblings than the others. In addition, males with children are more likely to survive than female with children, and in general people with children on board are less likely to survive than those without children.
+
+```
+
+### Task D: Predict Outcomes in Testing Data
+
+> We will likely not be able to do this during the class exercise. This task is for you to do as your homework. 
+
+We have saved a small part of data to test our model. This is the **Testing Data**. We will use this data to see how good of a prediction is made by the model we created in Task D above.
+
+You should do the following:
+
+- Import the testing data in TitanicTest.csv
+- Check that you have all the predictor variables. It will natually not have the response variable
+- Do any variable need recoding to match the training dataset? If yes then do the necessary variable recoding
+- Predict the Survival Probability for the Testing Dataset using the model developed on the training dataset in Step C above
+- Convert probabilities to a a binary outcome (1 for Prob > 0.5, otherwise 0 - or choose your own threshold)
+
+
+```{r,Cache=TRUE}
+
+test <- read_csv(here::here("data","TitanicTest.csv"))
+summary(test)
+#str(test)
+test$Pclass <- as.factor(test$Pclass)
+```
+###Put in the ages
+
+
+```{r}
+agemodel2 <- lm(Age ~ Pclass + Sex + SibSp, data=test)
+summary(agemodel2)
+```
+
+```{r}
+test$Pclass <- as.factor(test$Pclass)
+range(predict(agemodel2, newdata=test))
+#This model is a little bit wierd.
+```
+
+```{r}
+
+test$Age <- ifelse(is.na(test$Age)==T, predict(agemodel2, newdata=test),test$Age)
+#test$Age[is.na(test$age)] <- predict(agemodel, newdata=test)[is.na(test$age)]
+test$Age[test$Age<0] <- 0
+summary(test$Age)
+```
+
+
+```{r}
+#predict(model4, newdata = test,  type = "response")
+test$Survived <- ifelse(predict(model4, newdata = test,  type = "response") >= 0.616, 1, 0)
+summary(test$Survived)
+```
+
+```{r}
+answer <- cbind(test$PassengerId, test$Survived)
+write.csv(answer, file = "TitanicPredict.csv")
+```
+
+### Task E: Compete with Rest of the World
+
+What you just did happens to be one of the ongoing competitions at kaggle.com. https://www.kaggle.com/c/titanic has more details. Once you have predicted outcomes on the test data, you need to create a submission file that has two columns: "PasserngerID" and "Survived".
+The second column should have 1 or 0 for survived or not. NA or missing values in this field is not permitted. 
+Create an account at kaggle and upload your solution at https://www.kaggle.com/c/titanic/submit
+
+Kaggle will evaluate your submission and let you know 
+
+1. What is your score (how good is your prediction)
+2. What is your rank among all submissions 
+
+```{}
+Enter here the following:
+1. Your Kaggle Username: yuzuruspooh 
+2. Your Kaggle Rank: 4885
+3. What did you learn in this exercise? Summarize your experience. What can you do better given more time?
+
+I learnt to make links between models and real-life implications and findings, so that to understand the models better and to be able to improve them. I also learnt how to optimize logistic models and linear models. I LOVED the competition, it gives me a sense of accomplishment.
+```
+
+
+> When you are done, submit you files (RMD and HTML) to Canvas for our weekly homework. Also submit you Kaggle rank and username. Lets see who in class gets the best rank on Kaggle.

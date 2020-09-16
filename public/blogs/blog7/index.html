@@ -1,0 +1,641 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="MAM student at London Business School; Professional ambition for consulting">
+	<meta name="author" content="Cecilia Zhiyan Chen">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>Logistics Regression Class Exercise &middot; Portfolio Website for Zhiyan Chen</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Zhiyan Chen</strong> <span>Keep pushing! Don&#39;t be like a grandma.</span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+                <li><a href="/blogs/ipsum">Generic Blog</a></li>
+            
+                <li><a href="/elements.html">Elements</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+                <li><a href="/" class="button fit">Log In</a></li>
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Logistics Regression Class Exercise</h1>
+                            </header>
+                            
+                            
+
+
+<blockquote>
+<p>We will do small exercise in Logistic Regression today. This will also become your submission for the day. We will do this work today in groups of two (or 3 in case of need). This will later also become your submission for the next homework. For the class submission, only one submission per team is needed - mention in comments (and in author field above) who all worked on it together.</p>
+</blockquote>
+<div id="titanic-survival-model" class="section level2">
+<h2>Titanic Survival Model</h2>
+<p>We want to find out what factors affected passengers' survival when Titanic sank. As survival is a binary measure, this task is well suited for a Logistic Regression analysis.</p>
+<div id="task-a-load-and-explore-the-data" class="section level3">
+<h3>Task A: Load and Explore the Data</h3>
+<p>Training Data (data for building our model) is saved in the file TitanicTrain.csv</p>
+<p>You should import TitanicTrain.csv data. Check the structure of the data using str() function.</p>
+<ul>
+<li>PClass: Passenger Class, Sibsp: Number of Siblings/Spouse aboard</li>
+<li>Parch: Number of Parents/Children aboard</li>
+<li>Are there variables that are not in the right class? If yes then convert those variables to the correct class</li>
+</ul>
+<pre class="r"><code>library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+## ✓ tibble  3.0.3     ✓ dplyr   1.0.0
+## ✓ tidyr   1.1.0     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(vroom)
+library(mosaic)</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: ggformula</code></pre>
+<pre><code>## Loading required package: ggstance</code></pre>
+<pre><code>## 
+## Attaching package: &#39;ggstance&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     geom_errorbarh, GeomErrorbarh</code></pre>
+<pre><code>## 
+## New to ggformula?  Try the tutorials: 
+##  learnr::run_tutorial(&quot;introduction&quot;, package = &quot;ggformula&quot;)
+##  learnr::run_tutorial(&quot;refining&quot;, package = &quot;ggformula&quot;)</code></pre>
+<pre><code>## Loading required package: mosaicData</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;mosaic&#39;:
+##   method                           from   
+##   fortify.SpatialPolygonsDataFrame ggplot2</code></pre>
+<pre><code>## 
+## The &#39;mosaic&#39; package masks several functions from core packages in order to add 
+## additional features.  The original behavior of these functions should not be affected by this.
+## 
+## Note: If you use the Matrix package, be sure to load it BEFORE loading mosaic.
+## 
+## Have you tried the ggformula package for your plots?</code></pre>
+<pre><code>## 
+## Attaching package: &#39;mosaic&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Matrix&#39;:
+## 
+##     mean</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     count, do, tally</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     cross</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     stat</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     binom.test, cor, cor.test, cov, fivenum, IQR, median, prop.test,
+##     quantile, sd, t.test, var</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     max, mean, min, prod, range, sample, sum</code></pre>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>## here() starts at /Users/czy1997/Desktop/LBS/Applied Stats/Website</code></pre>
+<pre class="r"><code>TitanicTrain &lt;- read_csv(here::here(&quot;data&quot;,&quot;TitanicTrain.csv&quot;))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   PassengerId = col_double(),
+##   Survived = col_double(),
+##   Pclass = col_double(),
+##   Name = col_character(),
+##   Sex = col_character(),
+##   Age = col_double(),
+##   SibSp = col_double(),
+##   Parch = col_double(),
+##   Ticket = col_character(),
+##   Fare = col_double(),
+##   Cabin = col_character(),
+##   Embarked = col_character()
+## )</code></pre>
+<pre class="r"><code>str(TitanicTrain)</code></pre>
+<pre><code>## tibble [891 × 12] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ PassengerId: num [1:891] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Survived   : num [1:891] 0 1 1 1 0 0 0 0 1 1 ...
+##  $ Pclass     : num [1:891] 3 1 3 1 3 3 1 3 3 2 ...
+##  $ Name       : chr [1:891] &quot;Braund, Mr. Owen Harris&quot; &quot;Cumings, Mrs. John Bradley (Florence Briggs Thayer)&quot; &quot;Heikkinen, Miss. Laina&quot; &quot;Futrelle, Mrs. Jacques Heath (Lily May Peel)&quot; ...
+##  $ Sex        : chr [1:891] &quot;male&quot; &quot;female&quot; &quot;female&quot; &quot;female&quot; ...
+##  $ Age        : num [1:891] 22 38 26 35 35 NA 54 2 27 14 ...
+##  $ SibSp      : num [1:891] 1 1 0 1 0 0 0 3 0 1 ...
+##  $ Parch      : num [1:891] 0 0 0 0 0 0 0 1 2 0 ...
+##  $ Ticket     : chr [1:891] &quot;A/5 21171&quot; &quot;PC 17599&quot; &quot;STON/O2. 3101282&quot; &quot;113803&quot; ...
+##  $ Fare       : num [1:891] 7.25 71.28 7.92 53.1 8.05 ...
+##  $ Cabin      : chr [1:891] NA &quot;C85&quot; NA &quot;C123&quot; ...
+##  $ Embarked   : chr [1:891] &quot;S&quot; &quot;C&quot; &quot;S&quot; &quot;S&quot; ...
+##  - attr(*, &quot;spec&quot;)=
+##   .. cols(
+##   ..   PassengerId = col_double(),
+##   ..   Survived = col_double(),
+##   ..   Pclass = col_double(),
+##   ..   Name = col_character(),
+##   ..   Sex = col_character(),
+##   ..   Age = col_double(),
+##   ..   SibSp = col_double(),
+##   ..   Parch = col_double(),
+##   ..   Ticket = col_character(),
+##   ..   Fare = col_double(),
+##   ..   Cabin = col_character(),
+##   ..   Embarked = col_character()
+##   .. )</code></pre>
+<pre class="r"><code>TitanicTrain$Name &lt;- NULL
+TitanicTrain$Ticket &lt;- NULL
+head(TitanicTrain)</code></pre>
+<pre><code>## # A tibble: 6 x 10
+##   PassengerId Survived Pclass Sex      Age SibSp Parch  Fare Cabin Embarked
+##         &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   
+## 1           1        0      3 male      22     1     0  7.25 &lt;NA&gt;  S       
+## 2           2        1      1 female    38     1     0 71.3  C85   C       
+## 3           3        1      3 female    26     0     0  7.92 &lt;NA&gt;  S       
+## 4           4        1      1 female    35     1     0 53.1  C123  S       
+## 5           5        0      3 male      35     0     0  8.05 &lt;NA&gt;  S       
+## 6           6        0      3 male      NA     0     0  8.46 &lt;NA&gt;  Q</code></pre>
+<pre class="r"><code>TitanicTrain$Pclass &lt;- as.factor(TitanicTrain$Pclass)</code></pre>
+</div>
+<div id="survival-rate" class="section level3">
+<h3>Survival rate</h3>
+<pre class="r"><code>sum(TitanicTrain$Survived)/891</code></pre>
+<pre><code>## [1] 0.3838384</code></pre>
+</div>
+<div id="originally-using-the-mean-to-replace-the-nas.-as-in-part-c-we-are-going-to-use-linear-models-to-replace-nas-the-nas-are-kept-as-they-are-for-here." class="section level3">
+<h3>Originally using the mean to replace the NA's. As in Part C we are going to use linear models to replace NA's, the NA's are kept as they are for here.</h3>
+<pre class="r"><code>#mean(TitanicTrain$Age, na.rm=TRUE)
+#TitanicTrain$Age &lt;- ifelse(is.na(TitanicTrain$Age)==T, mean(TitanicTrain$Age, na.rm=T), TitanicTrain$Age)
+#TitanicTrain$Age[is.na(TitanicTrain$age)] &lt;- mean(TitanicTrain$Age, na.rm=T)
+
+summary(TitanicTrain$Age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+##    0.42   20.12   28.00   29.70   38.00   80.00     177</code></pre>
+<div id="or-to-build-a-lm" class="section level5">
+<h5>Or to build a lm</h5>
+</div>
+</div>
+<div id="task-b-build-our-model" class="section level3">
+<h3>Task B: Build Our Model</h3>
+<p>Build a logistic regression model with Survival as the response variable. In this section, let's first build a main effects model. What variables do you need to include as the predictor variables?</p>
+<pre class="r"><code>logit.model &lt;- glm(Survived ~ Sex + Age + Pclass, data = TitanicTrain, family = &quot;binomial&quot;)
+summary(logit.model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Sex + Age + Pclass, family = &quot;binomial&quot;, 
+##     data = TitanicTrain)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.7303  -0.6780  -0.3953   0.6485   2.4657  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  3.777013   0.401123   9.416  &lt; 2e-16 ***
+## Sexmale     -2.522781   0.207391 -12.164  &lt; 2e-16 ***
+## Age         -0.036985   0.007656  -4.831 1.36e-06 ***
+## Pclass2     -1.309799   0.278066  -4.710 2.47e-06 ***
+## Pclass3     -2.580625   0.281442  -9.169  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 964.52  on 713  degrees of freedom
+## Residual deviance: 647.28  on 709  degrees of freedom
+##   (177 observations deleted due to missingness)
+## AIC: 657.28
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+<div id="being-male-in-different-classes" class="section level3">
+<h3>Being male in different classes</h3>
+<pre class="r"><code>model &lt;- glm(Survived ~ Sex * Pclass, data = TitanicTrain, family = &quot;binomial&quot;)
+summary(model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Sex * Pclass, family = &quot;binomial&quot;, data = TitanicTrain)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.6248  -0.5853  -0.5395   0.4056   1.9996  
+## 
+## Coefficients:
+##                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)       3.4122     0.5868   5.815 6.06e-09 ***
+## Sexmale          -3.9494     0.6161  -6.411 1.45e-10 ***
+## Pclass2          -0.9555     0.7248  -1.318  0.18737    
+## Pclass3          -3.4122     0.6100  -5.594 2.22e-08 ***
+## Sexmale:Pclass2  -0.1850     0.7939  -0.233  0.81575    
+## Sexmale:Pclass3   2.0958     0.6572   3.189  0.00143 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.7  on 890  degrees of freedom
+## Residual deviance:  798.1  on 885  degrees of freedom
+## AIC: 810.1
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div id="males-in-3rd-class-were-not-classic-gentlemen-as-males-in-1st-in-the-sense-that-they-didnt-give-seats-to-the-females-and-cared-more-about-themselves." class="section level3">
+<h3>Males in 3rd class were not classic gentlemen as males in 1st in the sense that they didn't give seats to the females and cared more about themselves.</h3>
+<pre class="r"><code>model3 &lt;- glm(Survived ~ SibSp * Sex , data = TitanicTrain, family = &quot;binomial&quot;)
+summary(model3)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ SibSp * Sex, family = &quot;binomial&quot;, data = TitanicTrain)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8194  -0.6534  -0.6382   0.6512   1.9086  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)     1.4430     0.1660   8.692  &lt; 2e-16 ***
+## SibSp          -0.4991     0.1251  -3.989 6.63e-05 ***
+## Sexmale        -2.8786     0.2017 -14.271  &lt; 2e-16 ***
+## SibSp:Sexmale   0.4467     0.1652   2.704  0.00685 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  897.71  on 887  degrees of freedom
+## AIC: 905.71
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div id="if-you-had-to-have-siblings-youd-better-to-be-a-male-to-have-a-higher-chance-of-surviving." class="section level3">
+<h3>If you had to have siblings, you'd better to be a male to have a higher chance of surviving.</h3>
+<pre class="r"><code>model4 &lt;- glm(Survived ~ Sex + Age + Pclass + SibSp + Parch * Sex, data = TitanicTrain, family = &quot;binomial&quot;)
+summary(model4)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Sex + Age + Pclass + SibSp + Parch * 
+##     Sex, family = &quot;binomial&quot;, data = TitanicTrain)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.6578  -0.6277  -0.3888   0.6108   2.4567  
+## 
+## Coefficients:
+##                Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)    4.363118   0.454455   9.601  &lt; 2e-16 ***
+## Sexmale       -2.861724   0.246137 -11.627  &lt; 2e-16 ***
+## Age           -0.042273   0.008257  -5.119 3.06e-07 ***
+## Pclass2       -1.377188   0.287019  -4.798 1.60e-06 ***
+## Pclass3       -2.566605   0.288097  -8.909  &lt; 2e-16 ***
+## SibSp         -0.385323   0.125371  -3.073  0.00212 ** 
+## Parch         -0.195534   0.145369  -1.345  0.17860    
+## Sexmale:Parch  0.507243   0.235621   2.153  0.03133 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 964.52  on 713  degrees of freedom
+## Residual deviance: 632.06  on 706  degrees of freedom
+##   (177 observations deleted due to missingness)
+## AIC: 648.06
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+<div id="if-you-were-travelling-with-a-child-then-your-chance-for-living-would-be-greater-if-you-were-a-male-than-being-a-female." class="section level3">
+<h3>If you were travelling with a child, then your chance for living would be greater if you were a male than being a female.</h3>
+<p>Builging a model is always only the first step. The more important task is <strong>interpreting</strong> the model - what insights does your model give you?</p>
+<pre><code>In conclusion, we can see that largely, Sex, Pclass, Age, SibSp are significantly influencing the chance of survival. There are also some factors that combinedly affect the survivalship.</code></pre>
+</div>
+<div id="task-c-improve-our-model" class="section level3">
+<h3>Task C: Improve Our Model</h3>
+<blockquote>
+<p>We will likely not be able to do this during the class exercise. This task is for you to do as your homework.</p>
+</blockquote>
+<p>How can we improve our model. There are several things you can try:</p>
+<ul>
+<li>Do we need any interaction effects?</li>
+<li>Do any of the variables have non-linear effects - should we include them in the model as a square term?</li>
+<li>Can we clean the data better? Can we <strong>infer</strong> the missing values rather than losing all that information?</li>
+</ul>
+<p>Pay specific attention to how will you compare whether any particular model is <strong>better</strong> than other models. Potential choices are looking at the AIC value and ANOVA test for nested models. ###Getting in the ages</p>
+<pre class="r"><code>agemodel &lt;- lm(Age ~ Pclass + Sex + SibSp, data=TitanicTrain)
+summary(agemodel)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Age ~ Pclass + Sex + SibSp, data = TitanicTrain)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -37.808  -8.235  -0.936   7.152  45.322 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  38.2079     1.1222  34.046  &lt; 2e-16 ***
+## Pclass2      -8.5630     1.3463  -6.361 3.60e-10 ***
+## Pclass3     -13.1299     1.1694 -11.228  &lt; 2e-16 ***
+## Sexmale       3.5996     1.0107   3.561 0.000394 ***
+## SibSp        -4.2715     0.5185  -8.238 8.42e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 12.74 on 709 degrees of freedom
+##   (177 observations deleted due to missingness)
+## Multiple R-squared:  0.2349, Adjusted R-squared:  0.2306 
+## F-statistic: 54.41 on 4 and 709 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>#Tried with every variable, that Parch and Fare are not significant.</code></pre>
+</div>
+<div id="predicting-the-ages-in-train" class="section level3">
+<h3>Predicting the ages in Train</h3>
+<pre class="r"><code>range(predict(agemodel, newdata=TitanicTrain))</code></pre>
+<pre><code>## [1] -9.094266 41.807513</code></pre>
+<pre class="r"><code>TitanicTrain$Age &lt;- ifelse(is.na(TitanicTrain$Age)==TRUE, predict(agemodel, newdata=TitanicTrain), TitanicTrain$Age)
+
+summary(TitanicTrain$Age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  -9.094  21.000  28.678  29.301  36.000  80.000</code></pre>
+</div>
+<div id="build-the-model-again-with-ages" class="section level3">
+<h3>Build the model again with ages</h3>
+<pre class="r"><code>model4 &lt;- glm(Survived ~ Sex + Age + Pclass + SibSp + Parch * Sex, data = TitanicTrain, family = &quot;binomial&quot;)
+summary(model4)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived ~ Sex + Age + Pclass + SibSp + Parch * 
+##     Sex, family = &quot;binomial&quot;, data = TitanicTrain)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.5783  -0.5930  -0.4088   0.5880   2.4595  
+## 
+## Coefficients:
+##                Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)    4.353509   0.431652  10.086  &lt; 2e-16 ***
+## Sexmale       -2.994158   0.220915 -13.553  &lt; 2e-16 ***
+## Age           -0.041795   0.008233  -5.076 3.85e-07 ***
+## Pclass2       -1.264865   0.270991  -4.668 3.05e-06 ***
+## Pclass3       -2.453246   0.261091  -9.396  &lt; 2e-16 ***
+## SibSp         -0.426889   0.106531  -4.007 6.15e-05 ***
+## Parch         -0.278014   0.142053  -1.957  0.05033 .  
+## Sexmale:Parch  0.677883   0.224161   3.024  0.00249 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  777.11  on 883  degrees of freedom
+## AIC: 793.11
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>What is your best model? Explain your best model - what are you seeing as significant? What is the interpretation? What does it mean?</p>
+<pre><code>After trials and errors, adding new variable combinations and deleting insignificant variables, I come up with this model4, which has a relatively lower AIC of 796.62. It tells us that males have less chance of survival compared to females, and so is the elderly, the class 2 and 3 passengers, people with siblings than the others. In addition, males with children are more likely to survive than female with children, and in general people with children on board are less likely to survive than those without children.
+</code></pre>
+</div>
+<div id="task-d-predict-outcomes-in-testing-data" class="section level3">
+<h3>Task D: Predict Outcomes in Testing Data</h3>
+<blockquote>
+<p>We will likely not be able to do this during the class exercise. This task is for you to do as your homework.</p>
+</blockquote>
+<p>We have saved a small part of data to test our model. This is the <strong>Testing Data</strong>. We will use this data to see how good of a prediction is made by the model we created in Task D above.</p>
+<p>You should do the following:</p>
+<ul>
+<li>Import the testing data in TitanicTest.csv</li>
+<li>Check that you have all the predictor variables. It will natually not have the response variable</li>
+<li>Do any variable need recoding to match the training dataset? If yes then do the necessary variable recoding</li>
+<li>Predict the Survival Probability for the Testing Dataset using the model developed on the training dataset in Step C above</li>
+<li>Convert probabilities to a a binary outcome (1 for Prob &gt; 0.5, otherwise 0 - or choose your own threshold)</li>
+</ul>
+<pre class="r"><code>test &lt;- read_csv(here::here(&quot;data&quot;,&quot;TitanicTest.csv&quot;))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   PassengerId = col_double(),
+##   Pclass = col_double(),
+##   Name = col_character(),
+##   Sex = col_character(),
+##   Age = col_double(),
+##   SibSp = col_double(),
+##   Parch = col_double(),
+##   Ticket = col_character(),
+##   Fare = col_double(),
+##   Cabin = col_character(),
+##   Embarked = col_character()
+## )</code></pre>
+<pre class="r"><code>summary(test)</code></pre>
+<pre><code>##   PassengerId         Pclass          Name               Sex           
+##  Min.   : 892.0   Min.   :1.000   Length:418         Length:418        
+##  1st Qu.: 996.2   1st Qu.:1.000   Class :character   Class :character  
+##  Median :1100.5   Median :3.000   Mode  :character   Mode  :character  
+##  Mean   :1100.5   Mean   :2.266                                        
+##  3rd Qu.:1204.8   3rd Qu.:3.000                                        
+##  Max.   :1309.0   Max.   :3.000                                        
+##                                                                        
+##       Age            SibSp            Parch           Ticket         
+##  Min.   : 0.17   Min.   :0.0000   Min.   :0.0000   Length:418        
+##  1st Qu.:21.00   1st Qu.:0.0000   1st Qu.:0.0000   Class :character  
+##  Median :27.00   Median :0.0000   Median :0.0000   Mode  :character  
+##  Mean   :30.27   Mean   :0.4474   Mean   :0.3923                     
+##  3rd Qu.:39.00   3rd Qu.:1.0000   3rd Qu.:0.0000                     
+##  Max.   :76.00   Max.   :8.0000   Max.   :9.0000                     
+##  NA&#39;s   :86                                                          
+##       Fare            Cabin             Embarked        
+##  Min.   :  0.000   Length:418         Length:418        
+##  1st Qu.:  7.896   Class :character   Class :character  
+##  Median : 14.454   Mode  :character   Mode  :character  
+##  Mean   : 35.627                                        
+##  3rd Qu.: 31.500                                        
+##  Max.   :512.329                                        
+##  NA&#39;s   :1</code></pre>
+<pre class="r"><code>#str(test)
+test$Pclass &lt;- as.factor(test$Pclass)</code></pre>
+</div>
+<div id="put-in-the-ages" class="section level3">
+<h3>Put in the ages</h3>
+<pre class="r"><code>agemodel2 &lt;- lm(Age ~ Pclass + Sex + SibSp, data=test)
+summary(agemodel2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Age ~ Pclass + Sex + SibSp, data = test)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -36.607  -6.614  -0.942   7.153  36.745 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  40.7857     1.4927  27.323  &lt; 2e-16 ***
+## Pclass2     -12.6206     1.8072  -6.984 1.61e-11 ***
+## Pclass3     -17.1795     1.6063 -10.695  &lt; 2e-16 ***
+## Sexmale       1.8215     1.3957   1.305   0.1928    
+## SibSp        -1.5308     0.7705  -1.987   0.0478 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 12.2 on 327 degrees of freedom
+##   (86 observations deleted due to missingness)
+## Multiple R-squared:  0.2689, Adjusted R-squared:  0.2599 
+## F-statistic: 30.07 on 4 and 327 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>test$Pclass &lt;- as.factor(test$Pclass)
+range(predict(agemodel2, newdata=test))</code></pre>
+<pre><code>## [1] 11.36004 42.60715</code></pre>
+<pre class="r"><code>#This model is a little bit wierd.</code></pre>
+<pre class="r"><code>test$Age &lt;- ifelse(is.na(test$Age)==T, predict(agemodel2, newdata=test),test$Age)
+#test$Age[is.na(test$age)] &lt;- predict(agemodel, newdata=test)[is.na(test$age)]
+test$Age[test$Age&lt;0] &lt;- 0
+summary(test$Age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.17   22.08   25.43   29.49   36.38   76.00</code></pre>
+<pre class="r"><code>#predict(model4, newdata = test,  type = &quot;response&quot;)
+test$Survived &lt;- ifelse(predict(model4, newdata = test,  type = &quot;response&quot;) &gt;= 0.616, 1, 0)
+summary(test$Survived)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.0000  0.0000  0.3182  1.0000  1.0000</code></pre>
+<pre class="r"><code>answer &lt;- cbind(test$PassengerId, test$Survived)
+write.csv(answer, file = &quot;TitanicPredict.csv&quot;)</code></pre>
+</div>
+<div id="task-e-compete-with-rest-of-the-world" class="section level3">
+<h3>Task E: Compete with Rest of the World</h3>
+<p>What you just did happens to be one of the ongoing competitions at kaggle.com. <a href="https://www.kaggle.com/c/titanic" class="uri">https://www.kaggle.com/c/titanic</a> has more details. Once you have predicted outcomes on the test data, you need to create a submission file that has two columns: &quot;PasserngerID&quot; and &quot;Survived&quot;. The second column should have 1 or 0 for survived or not. NA or missing values in this field is not permitted. Create an account at kaggle and upload your solution at <a href="https://www.kaggle.com/c/titanic/submit" class="uri">https://www.kaggle.com/c/titanic/submit</a></p>
+<p>Kaggle will evaluate your submission and let you know</p>
+<ol style="list-style-type: decimal">
+<li>What is your score (how good is your prediction)</li>
+<li>What is your rank among all submissions</li>
+</ol>
+<pre><code>Enter here the following:
+1. Your Kaggle Username: yuzuruspooh 
+2. Your Kaggle Rank: 4885
+3. What did you learn in this exercise? Summarize your experience. What can you do better given more time?
+
+I learnt to make links between models and real-life implications and findings, so that to understand the models better and to be able to improve them. I also learnt how to optimize logistic models and linear models. I LOVED the competition, it gives me a sense of accomplishment.</code></pre>
+<blockquote>
+<p>When you are done, submit you files (RMD and HTML) to Canvas for our weekly homework. Also submit you Kaggle rank and username. Lets see who in class gets the best rank on Kaggle.</p>
+</blockquote>
+</div>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.twitter.com" class="icon alt fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                
+                    <li><a href="https://www.facebook.com" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+                    <li><a href="https://www.github.com" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.linkedin.com" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Company Name</li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

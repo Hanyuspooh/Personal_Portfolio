@@ -104,8 +104,8 @@ disqusShortname = ""
       url = "http://Hanyuspooh/Datathon2019_Umich_Zhiyan"
 
     [[params.tiles.showcase]]
-      title = "Consulting Project"
-      subtitle = "Not yet ready"
+      title = "TFL bike sharing"
+      subtitle = "TFL bike sharing"
       image = "pic03.jpg"
       url = "blogs/magna"
 

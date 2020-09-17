@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="MAM student at London Business School; Professional ambition for consulting">
+	<meta name="author" content="Cecilia Zhiyan Chen">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>TFL bike sharing &middot; Portfolio Website for Zhiyan Chen</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Zhiyan Chen</strong> <span>Keep pushing! Don&#39;t be like a grandma.</span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+                <li><a href="/blogs/ipsum">Generic Blog</a></li>
+            
+                <li><a href="/elements.html">Elements</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+                <li><a href="/" class="button fit">Log In</a></li>
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>TFL bike sharing</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/blogs/pic01.jpg" alt="" /></span>
+                            
+                            
+
+
+<div id="excess-rentals-in-tfl-bike-sharing" class="section level3">
+<h3>Excess rentals in TfL bike sharing</h3>
+<pre class="r"><code>url &lt;- &quot;https://data.london.gov.uk/download/number-bicycle-hires/ac29363e-e0cb-47cc-a97a-e216d900a6b0/tfl-daily-cycle-hires.xlsx&quot;
+
+# Download TFL data to temporary file
+httr::GET(url, write_disk(bike.temp &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
+<pre><code>## Response [https://airdrive-secure.s3-eu-west-1.amazonaws.com/london/dataset/number-bicycle-hires/2020-08-26T09%3A19%3A21/tfl-daily-cycle-hires.xlsx?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=AKIAJJDIMAIVZJDICKHA%2F20200917%2Feu-west-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20200917T020131Z&amp;X-Amz-Expires=300&amp;X-Amz-Signature=b698e47cf3c703f6301e64600c5b722540165d5495d80d4a3199752c4b029ec0&amp;X-Amz-SignedHeaders=host]
+##   Date: 2020-09-17 02:01
+##   Status: 200
+##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+##   Size: 164 kB
+## &lt;ON DISK&gt;  /var/folders/s8/dc1vl73j32b7qs__g4yxskzh0000gn/T//Rtmpz7cjG0/filed33f710bf72b.xlsx</code></pre>
+<pre class="r"><code># Use read_excel to read it as dataframe
+bike0 &lt;- read_excel(bike.temp,
+                   sheet = &quot;Data&quot;,
+                   range = cell_cols(&quot;A:B&quot;))
+
+# change dates to get year, month, and week
+bike &lt;- bike0 %&gt;% 
+  clean_names() %&gt;% 
+  rename (bikes_hired = number_of_bicycle_hires) %&gt;% 
+  mutate (year = year(day),
+          month = lubridate::month(day, label = TRUE),
+          week = isoweek(day))</code></pre>
+<p>We can easily create a facet grid that plots bikes hired by month and year.</p>
+<p><img src="/Users/czy1997/Desktop/LBS/Applied%20Stats/Website/static/img/blogs/tfl_distributions_monthly.png" width="100%" /></p>
+<p>The distribution of bike rentals for May and June 2020 appears to be more spread out when compared to previous years. This higher standard deviation in bike rentals in summar 2020 is as a result of the COVID-19 lockdown which changed the movement patterns of people in the city compared with previous years. People now use bikes rather than public transport for both essential travel and leisure.This explains some of the days in May and June that saw a high number of bikes being rented. However the lockdown has also caused bike rentals to be adversely affected on certain days with people having to work from home rather than office and not moving about as much.</p>
+<p>Monthly changes in Tfl bike rentals:</p>
+<pre class="r"><code>#calculating actual and expected monthly averages for bike rentals
+m1&lt;-bike %&gt;%
+  filter(year %in% c(&quot;2015&quot;,&quot;2016&quot;,&quot;2017&quot;,&quot;2018&quot;,&quot;2019&quot;,&quot;2020&quot;)) %&gt;% 
+  group_by(month,year) %&gt;% 
+  summarise(actual=median(bikes_hired))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;month&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>m2&lt;-m1 %&gt;%
+  filter(year!=&quot;2020&quot;) %&gt;% 
+  group_by(month) %&gt;% 
+  summarise(expect=median(actual))</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>monthly_average&lt;-left_join(m1,m2,&quot;month&quot;,&quot;year&quot;)
+
+
+ggplot(data=monthly_average, aes(x=month))+
+  #plotting two lines, blue for expected and black for actual rentals
+  geom_line(aes(y=actual, group = 1), color= &quot;black&quot;,size=0.8) +
+  geom_line(aes(y=expect, group = 1), color= &quot;blue&quot;) +
+  facet_wrap(~year)+
+  geom_ribbon(aes(x = month, ymin = actual, ymax = expect, fill= actual&gt; expect))+
+  theme_pander()+
+  scale_fill_manual(values=c(&quot;green&quot;, &quot;red&quot;), name=&quot;fill&quot;)+
+  labs (
+    title = &quot;Weekly changes in TfL bike rentals&quot;,
+    subtitle= &quot;Change in monthly average shown in blue and calculated between 2015-2019&quot;,
+    caption=&quot;Source: TfL, London Data Store&quot;,
+    y= &quot;Bike rentals&quot;
+  )+
+  theme(
+    axis.title.x=element_blank(),
+    legend.position=&quot;none&quot;
+  )</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/weekly%20changes%20in%20TFL%20bike%20rentals,%20fig8-1.png" width="1248" /> The blus line indicates the mean value for a particular month during the six years, so that is the expect value for that month, whereas the black line shows the actual rental amount for TFL sharing bikes in that month. We can see that apart from the obvious peak of bike usage in summer and lower usages in winter months, in 2016 the actual usage was higher than expected in the autumn months while in 2018 it were the summer and autumn months that witnessed higher rental income. For the year 2020, due to the pandemic, sharing bike usage droped significantly for the spring but went back to more than expected from May 2020 onwards, indicating a coming-back for TFL bikes and the rise of willingness of bike sharing for residents in London. The sudden rise shows how much people missed riding outside, as the demand keeps flat until July and there has been no upwards trend like the normal years as the summer comes.</p>
+</div>
+<div id="weekly-changes-in-tfl-bike-rentals" class="section level3">
+<h3>Weekly changes in Tfl bike rentals:</h3>
+<pre class="r"><code>#calculating expected weekly averages for bike rentals
+weekly_avg &lt;- bike %&gt;% 
+  filter(year %in% c(&quot;2015&quot;, &quot;2016&quot;, &quot;2017&quot;, &quot;2018&quot;, &quot;2019&quot;)) %&gt;% 
+  group_by(year, week) %&gt;% 
+  summarise(sum_rentals_period= sum(bikes_hired)) %&gt;% 
+  group_by(week) %&gt;% 
+  summarise(expected_rentals= median(sum_rentals_period))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;year&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre class="r"><code>z = c(13,26,39,53)
+
+#actual weekly rentals 
+weekly_changes &lt;- bike %&gt;% 
+  filter(year %in% c(&quot;2015&quot;, &quot;2016&quot;, &quot;2017&quot;, &quot;2018&quot;, &quot;2019&quot;, &quot;2020&quot;)) %&gt;% 
+  group_by(year, week) %&gt;% 
+  summarise(actual_rentals= sum(bikes_hired)) %&gt;% 
+  left_join(weekly_avg, by=&quot;week&quot;) %&gt;% 
+  mutate(diff_rentals= (actual_rentals- expected_rentals)/expected_rentals,
+         sign= ifelse(diff_rentals&gt;0, &quot;pos&quot;, &quot;neg&quot;))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;year&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>ggplot(weekly_changes)+
+  #creating the grey tiles in plot background
+  geom_rect(aes(xmin = 13, xmax = 26, ymin = -Inf, ymax = Inf),
+                   fill = &quot;#f0f0f0&quot;, alpha = 0.002)+
+  geom_rect(aes(xmin = 39, xmax = 53, ymin = -Inf, ymax = Inf),
+                   fill = &quot;#f0f0f0&quot;, alpha = 0.002)+
+  #adding a ribbon with color, green for positive diff and red for negative diff
+  geom_ribbon(aes(x = week, ymin = 0, ymax = diff_rentals, fill =diff_rentals&lt;0, alpha=0.30))+
+  geom_line(aes(x= week, y = diff_rentals, alpha=0.3))+
+  #creating the rug
+  geom_rug(data = . %&gt;%  filter(diff_rentals&gt; 0),
+           mapping=aes(x=week, y= diff_rentals), color= &quot;#a1d99b&quot;, sides=&quot;b&quot;)+
+  geom_rug(data = . %&gt;%  filter(diff_rentals&lt; 0),
+          mapping=aes(x=week, y= diff_rentals), color= &quot;#a50f15&quot;, sides=&quot;b&quot;)+
+  facet_wrap(~year)+
+  theme_pander()+
+  labs (
+    title = &quot;Weekly changes in TfL bike rentals&quot;,
+    subtitle= &quot;% change from weekly averages calculated between 2015-2019&quot;,
+    caption=&quot;Source: TfL, London Data Store&quot;
+  )+
+  theme(
+    axis.title.y=element_blank(),
+    legend.position=&quot;none&quot;
+  )+
+  scale_y_continuous(labels = scales::percent)+
+  #defining ticks on x-axis
+  scale_x_continuous(breaks=z)+
+  scale_fill_manual(values=c(&quot;#a1d99b&quot;, &quot;#bd0026&quot;), name=&quot;fill&quot;)</code></pre>
+<p><img src="/blogs/blog6_files/figure-html/weekly%20changes%20in%20TFL%20bike%20rentals,%20fig9-1.png" width="1152" /></p>
+<p>We used the median rather than the mean to calculate expected rentals since the median is less affected by the presence of outliers i.e days with a very high or very low number of bikes rented.</p>
+<p>The green shadows indicate a positive percentage change and the red shadows mean the opposite. We can see a rise in spring months for most of the years and a decrease before winter especially when it comes to New Year. In 2020, however, after a mojor decrease due to the pandemic from week 12 to 20, as the lockdown ended, a sudden increase is seen for TFL bike sharing.</p>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.twitter.com" class="icon alt fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                
+                    <li><a href="https://www.facebook.com" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+                    <li><a href="https://www.github.com" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.linkedin.com" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Company Name</li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

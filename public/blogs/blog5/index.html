@@ -118,49 +118,50 @@ glimpse(nyt_mask_survey)</code></pre>
 <h2>Choropleth map</h2>
 <p>The FIPS code is a federal code that numbers states and territories of the US. It extends to the county level with an additional four digits, so every county in the US has a unique six-digit identifier, where the first two digits represent the state.</p>
 <p>We will be using Kieran Healy's <code>socviz</code> package which among other things contains <code>county_map</code> and <code>county_data</code></p>
+<p>We want to take a look at the datasets first</p>
 <pre class="r"><code># America’s choropleths; use county_map that has all polygons 
 # and county data with demographics/election data from socviz datafile
 # The id field is the FIPS code for the county
 county_map %&gt;% 
   sample_n(5)</code></pre>
 <pre><code>##      long      lat  order  hole piece            group    id
-## 1 1497094 -1167350  39908 FALSE     1 0500000US13035.1 13035
-## 2 -723434 -2191039  13579 FALSE     4 0500000US02195.4 02195
-## 3 1764470  -144207 141176 FALSE     1 0500000US42083.1 42083
-## 4 2398364    33183  84202 FALSE     1 0500000US25007.1 25007
-## 5 1453068  -579254  67095 FALSE     1 0500000US21135.1 21135</code></pre>
+## 1 1128183 -1027309 154980 FALSE     1 0500000US47181.1 47181
+## 2 1090960 -1349723    884 FALSE     1 0500000US01023.1 01023
+## 3  871174  -858798 104505 FALSE     1 0500000US29207.1 29207
+## 4  547271 -1225743  23381 FALSE     1 0500000US05133.1 05133
+## 5 1736312  -354154 140498 FALSE     1 0500000US42051.1 42051</code></pre>
 <pre class="r"><code>county_data %&gt;%
     sample_n(5)</code></pre>
-<pre><code>##      id             name state census_region      pop_dens   pop_dens4
-## 1 53053    Pierce County    WA          West [  100,  500) [118,71672]
-## 2 51109    Louisa County    VA         South [   50,  100) [ 45,  118)
-## 3 18147   Spencer County    IN       Midwest [   50,  100) [ 45,  118)
-## 4 13137 Habersham County    GA         South [  100,  500) [118,71672]
-## 5 47025 Claiborne County    TN         South [   50,  100) [ 45,  118)
+<pre><code>##      id              name state census_region      pop_dens   pop_dens4
+## 1 21005   Anderson County    KY         South [  100,  500) [ 45,  118)
+## 2 21125     Laurel County    KY         South [  100,  500) [118,71672]
+## 3 46091   Marshall County    SD       Midwest [    0,   10) [  0,   17)
+## 4 22063 Livingston Parish    LA         South [  100,  500) [118,71672]
+## 5 13135   Gwinnett County    GA         South [ 1000, 5000) [118,71672]
 ##     pop_dens6   pct_black    pop female white black travel_time land_area
-## 1 [215,71672] [ 5.0,10.0) 831928   50.3  76.5   7.3        28.8      1670
-## 2 [ 45,   82) [15.0,25.0)  34348   50.8  79.6  17.2        35.1       496
-## 3 [ 45,   82) [ 0.0, 2.0)  20801   49.5  97.7   0.8        26.8       397
-## 4 [ 82,  215) [ 2.0, 5.0)  43752   52.6  90.7   4.0        23.6       277
-## 5 [ 45,   82) [ 0.0, 2.0)  31592   51.2  96.8   1.1        25.8       435
+## 1 [ 82,  215) [ 2.0, 5.0)  21888   51.0  95.8   2.1        26.3       202
+## 2 [ 82,  215) [ 0.0, 2.0)  60015   51.1  97.2   0.8        21.4       434
+## 3 [  0,    9) [ 0.0, 2.0)   4683   45.4  87.0   1.4        17.4       838
+## 4 [ 82,  215) [ 5.0,10.0) 135751   50.4  91.8   6.0        34.3       648
+## 5 [215,71672] [25.0,50.0) 877922   50.9  59.1  26.3        31.6       430
 ##   hh_income su_gun4 su_gun6  fips votes_dem_2016 votes_gop_2016
-## 1     59204 [ 5, 8) [ 7, 8) 53053         160306         136046
-## 2     54518 [11,54] [10,12) 51109           6208          10507
-## 3     52991 [ 5, 8) [ 7, 8) 18147           2861           6572
-## 4     39306 [ 5, 8) [ 7, 8) 13137           2483          13184
-## 5     33229 [11,54] [12,54] 47025           1831           8589
+## 1     52646 [ 8,11) [ 8,10) 21005           2634           8242
+## 2     36570 [11,54] [10,12) 21125           3440          20592
+## 3     46597 [ 0, 5) [ 0, 4) 46091            754           1056
+## 4     56811 [11,54] [10,12) 22063           6950          48797
+## 5     60445 [ 0, 5) [ 4, 7) 13135         165063         146463
 ##   total_votes_2016 per_dem_2016 per_gop_2016 diff_2016 per_dem_2012
-## 1           322592        0.497        0.422     24260        0.543
-## 2            17507        0.355        0.600      4299        0.424
-## 3             9959        0.287        0.660      3711        0.414
-## 4            16128        0.154        0.817     10701        0.157
-## 5            10706        0.171        0.802      6758        0.239
+## 1            11414        0.231        0.722      5608        0.321
+## 2            24811        0.139        0.830     17152        0.174
+## 3             1947        0.387        0.542       302        0.534
+## 4            57700        0.120        0.846     41847        0.138
+## 5           323931        0.510        0.452     18600        0.446
 ##   per_gop_2012 diff_2012  winner partywinner16 winner12 partywinner12 flipped
-## 1        0.434     36452 Clinton      Democrat    Obama      Democrat      No
-## 2        0.561      2258   Trump    Republican   Romney    Republican      No
-## 3        0.567      1489   Trump    Republican   Romney    Republican      No
-## 4        0.832      9851   Trump    Republican   Romney    Republican      No
-## 5        0.748      5184   Trump    Republican   Romney    Republican      No</code></pre>
+## 1        0.661      3507   Trump    Republican   Romney    Republican      No
+## 2        0.810     14246   Trump    Republican   Romney    Republican      No
+## 3        0.447       172   Trump    Republican    Obama      Democrat     Yes
+## 4        0.842     38040   Trump    Republican   Romney    Republican      No
+## 5        0.540     27684 Clinton      Democrat   Romney    Republican     Yes</code></pre>
 <pre class="r"><code>glimpse(county_data)</code></pre>
 <pre><code>## Rows: 3,195
 ## Columns: 32
@@ -212,12 +213,6 @@ glimpse(county_map)</code></pre>
 </div>
 <div id="joing-the-files" class="section level2">
 <h2>Joing the files</h2>
-<p>We have three files</p>
-<ol style="list-style-type: decimal">
-<li><code>nyt_mask_survey</code>, our NYT survey data,</li>
-<li><code>county_map</code> that has all polygons that define a county</li>
-<li><code>county_data</code> with demographics/election data.</li>
-</ol>
 <pre class="r"><code>county_full &lt;- left_join(county_map, county_data, by = &quot;id&quot;)
 
 county_masks_full &lt;- left_join(county_full, nyt_mask_survey, 
@@ -234,11 +229,6 @@ p1 &lt;- p +
   geom_polygon(color = &quot;gray90&quot;, size = 0.05) + 
   coord_equal()
 
-
-
-p2 &lt;- p1 + 
-  scale_fill_gradient(low = &#39;#ffffcc&#39;, high= &#39;#006837&#39;)
-
 p3 &lt;- p1 + 
   scale_fill_gradient2()
 
@@ -247,20 +237,17 @@ p3 &lt;- p1 +
 p4 &lt;- p1 + 
   scale_fill_gradientn(colours = c(&#39;#8c510a&#39;,&#39;#d8b365&#39;,&#39;#f6e8c3&#39;,&#39;#c7eae5&#39;,&#39;#5ab4ac&#39;,&#39;#01665e&#39;))
 
-p1</code></pre>
+p3</code></pre>
 <p><img src="/blogs/blog5_files/figure-html/plot_choropleths-1.png" width="648" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>p2</code></pre>
-<p><img src="/blogs/blog5_files/figure-html/plot_choropleths-2.png" width="648" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>p3</code></pre>
-<p><img src="/blogs/blog5_files/figure-html/plot_choropleths-3.png" width="648" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>p4</code></pre>
-<p><img src="/blogs/blog5_files/figure-html/plot_choropleths-4.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/blogs/blog5_files/figure-html/plot_choropleths-2.png" width="648" style="display: block; margin: auto;" /></p>
+<p>This is what we get from the dataset for every counties in the States. A deeper or greener colour indicates more willingness to wear a mask, while a paler or more brown colour represents less acceptance to mask wearing during the Covid-19 pandemic.</p>
 <pre class="r"><code>p4 + labs(fill = &quot;Mask acceptance, (Mostly Yes - Mostly No)&quot;, 
           caption = &quot;“Estimates from The New York Times, based on roughly 250,000 interviews \nconducted by Dynata from July 2 to July 14, 2020”&quot;) +
   guides(fill = guide_legend(nrow = 1)) + 
   theme_map() + 
   theme(legend.position = &quot;bottom&quot;)</code></pre>
-<p><img src="/blogs/blog5_files/figure-html/plot_choropleths-5.png" width="648" style="display: block; margin: auto;" /></p>
+<p><img src="/blogs/blog5_files/figure-html/unnamed-chunk-2-1.png" width="648" style="display: block; margin: auto;" /></p>
 </div>
 <div id="checking-for-relationships" class="section level2">
 <h2>Checking for relationships</h2>
@@ -270,6 +257,8 @@ p1</code></pre>
   GGally::ggpairs()+
   theme_minimal()</code></pre>
 <p><img src="/blogs/blog5_files/figure-html/ggpairs-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>From this graph we conclude that higher the income level and higher the population of the county, higher the acceptance of wearing masks for the U.S.</p>
+<p>Stay Safe!</p>
 </div>
 
                         </div>

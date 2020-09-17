@@ -71,6 +71,7 @@ The FIPS code is a federal code that numbers states and territories of the US. I
 
 We will be using Kieran Healy's `socviz` package which among other things contains `county_map` and `county_data`  
 
+We want to take a look at the datasets first
 ```{r}
 # America’s choropleths; use county_map that has all polygons 
 # and county data with demographics/election data from socviz datafile
@@ -95,13 +96,6 @@ glimpse(county_map)
 
 ## Joing the files
 
-We have three files
-
-1. `nyt_mask_survey`, our NYT survey data, 
-1. `county_map` that has all polygons that define a county
-1. `county_data` with demographics/election data.
-
-
 
 ```{r, join_data}
 
@@ -125,11 +119,6 @@ p1 <- p +
   geom_polygon(color = "gray90", size = 0.05) + 
   coord_equal()
 
-
-
-p2 <- p1 + 
-  scale_fill_gradient(low = '#ffffcc', high= '#006837')
-
 p3 <- p1 + 
   scale_fill_gradient2()
 
@@ -138,12 +127,14 @@ p3 <- p1 +
 p4 <- p1 + 
   scale_fill_gradientn(colours = c('#8c510a','#d8b365','#f6e8c3','#c7eae5','#5ab4ac','#01665e'))
 
-p1
-p2
 p3
 p4
 
+```
 
+This is what we get from the dataset for every counties in the States. A deeper or greener colour indicates more willingness to wear a mask, while a paler or more brown colour represents less acceptance to mask wearing during the Covid-19 pandemic.
+
+```{r}
 p4 + labs(fill = "Mask acceptance, (Mostly Yes - Mostly No)", 
           caption = "“Estimates from The New York Times, based on roughly 250,000 interviews \nconducted by Dynata from July 2 to July 14, 2020”") +
   guides(fill = guide_legend(nrow = 1)) + 
@@ -161,3 +152,8 @@ county_masks_full %>%
   GGally::ggpairs()+
   theme_minimal()
 ```
+
+
+From this graph we conclude that higher the income level and higher the population of the county, higher the acceptance of wearing masks for the U.S.
+
+Stay Safe!

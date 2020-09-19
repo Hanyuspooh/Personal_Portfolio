@@ -110,8 +110,8 @@ disqusShortname = ""
       url = "blogs/blog7"
 
     [[params.tiles.showcase]]
-      title = "Ipsum"
-      subtitle = "Nisl Sed Aliquam"
+      title = "AirBnB price prediction Beijing"
+      subtitle = "How much does it cost for two people's four day stay for a short visit in Beijing?"
       image = "pic04.jpg"
       url = "blogs/blog8"
 

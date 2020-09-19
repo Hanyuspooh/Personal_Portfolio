@@ -6,10 +6,20 @@
     <description>Recent content on Portfolio Website for Zhiyan Chen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 16 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 19 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Predicting price of an AirBnB for 2 people staying 4 nights in Beijing</title>
+      <link>/blogs/blog8/</link>
+      <pubDate>Sat, 19 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blogs/blog8/</guid>
+      <description>Executive Summary The goal of this project is to predict the total cost for two people staying 4 nights in an AirBnB in Beijing. We downloaded the data from insideairbnb.com and followed the IICE method (import data, inspect data, clean data, explore data).
+After importing the data, we looked at the data entries and variables in order to adapt them to our required format.</description>
+    </item>
     
     <item>
       <title>magna</title>

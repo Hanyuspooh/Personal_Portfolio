@@ -1,0 +1,941 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="MAM student at London Business School; Professional ambition for consulting">
+	<meta name="author" content="Cecilia Zhiyan Chen">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>Predicting price of an AirBnB for 2 people staying 4 nights in Beijing &middot; Portfolio Website for Zhiyan Chen</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Zhiyan Chen</strong> <span>Keep pushing! Don&#39;t be like a grandma.</span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+                <li><a href="/blogs/ipsum">Generic Blog</a></li>
+            
+                <li><a href="/elements.html">Elements</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+                <li><a href="/" class="button fit">Log In</a></li>
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>Predicting price of an AirBnB for 2 people staying 4 nights in Beijing</h1>
+                            </header>
+                            
+                            <h1 id="executive-summary">Executive Summary</h1>
+<p>The goal of this project is to predict the total cost for two people staying 4 nights in an AirBnB in Beijing. We downloaded the data from insideairbnb.com and followed the IICE method (import data, inspect data, clean data, explore data).</p>
+<p>After importing the data, we looked at the data entries and variables in order to adapt them to our required format. We created factor variables and turned some character variables into numeric values. While skimming through the data, we discovered several anomalies inside the data such as really high outliers and NAs that were either removed or replaced. We did the following to clean the data:</p>
+<ul>
+<li>
+<p>Firstly, we selected only relevant columns to decrease the size of our dataframe and created our variable of interest price_4_nights which calculates the cost for two people staying in Beijing for 4 nights. Also, we removed the accommodations that have more than 5 bedrooms and or 5 bathrooms as two people will most likely not look for such a big Airbnbs.</p>
+</li>
+<li>
+<p>Secondly we clustered the type of accommodations into the top 4 most popular and “Other”.</p>
+</li>
+<li>
+<p>Thirdly, we grouped the different areas into 4 zones of Beijing as we believe that certain districts will be more appealing for a tourist than others and could thus lead to higher Airbnb prices.</p>
+</li>
+<li>
+<p>Fourthly, preliminary regression analysis showed us that being a host for more than 4 years does have a significant effect on price. This led us to create a variable that checks whether a host has been with Airbnb for more than 4 years or not.</p>
+</li>
+<li>
+<p>Lastly, we looked at the amenities and created columns for the amenities which we believed would not be offered by all Airbnbs and could therefore have an impact on the price.</p>
+</li>
+</ul>
+<p>After having adapted the dataframe to our needs, we created several boxplots, scatterplots and correlation plots for our variables in order to look at their spread and the relationships among them. We also used ggpairs to look at the correlation of our chosen variables and see whether they would be of use later for our ideal model.</p>
+<p>After creating informative visualisations, we created our first model consisting of different combinations of variables. In order to increase our adjusted R squared, we added new variables and removed insignificant variables (t-value below 2 and thus p value more than 5%). To compare all our models we used huxreg and also used vif to confirm that the variables in our model are not multicorrelated. We finally decided on a model that includes room_type, number_of_reviews, neighbourhood_simplified, has_breakfast, accommodates, host_is_superhost, review_scores_rating, is_host_plus_4, prop_type_simplified, beds, bedrooms, bathrooms, cancellation_policy and reviews_per_month. This model reaches 55% adjusted R-squared and therefore explains 55% of the variability in price_4_nights.</p>
+<p>As the last step, we predicted the prie for 2 people staying for 4 nights in Beijing along with the 95% prediction intervals.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">knitr<span style="color:#f92672">::</span>opts_chunk<span style="color:#f92672">$</span><span style="color:#a6e22e">set</span>(
+  message <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, 
+  warning <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, 
+  tidy<span style="color:#f92672">=</span><span style="color:#66d9ef">FALSE</span>,     <span style="color:#75715e"># display code as typed</span>
+  size<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;small&#34;</span>)   <span style="color:#75715e"># slightly smaller font for code</span>
+<span style="color:#a6e22e">options</span>(digits <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>)
+
+<span style="color:#75715e"># default figure size</span>
+knitr<span style="color:#f92672">::</span>opts_chunk<span style="color:#f92672">$</span><span style="color:#a6e22e">set</span>(
+  fig.width<span style="color:#f92672">=</span><span style="color:#ae81ff">6.75</span>, 
+  fig.height<span style="color:#f92672">=</span><span style="color:#ae81ff">6.75</span>,
+  fig.align <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;center&#34;</span>
+)
+</code></pre></div><p>In order to predict the total cost for two people staying 4 nights in an AirBnB in Beijing we downloaded the data from insideairbnb.com (<a href="http://data.insideairbnb.com/china/beijing/beijing/2020-06-19/data/listings.csv.gz">http://data.insideairbnb.com/china/beijing/beijing/2020-06-19/data/listings.csv.gz</a>) into R studio using the vroom package and cleaned the column names using <code>clean_names()</code> from the janitor package.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(ggplot2)
+<span style="color:#a6e22e">library</span>(leaflet)
+<span style="color:#a6e22e">library</span>(here)
+<span style="color:#a6e22e">library</span>(GGally)
+<span style="color:#a6e22e">library</span>(ggfortify)
+<span style="color:#a6e22e">library</span>(broom)
+<span style="color:#a6e22e">library</span>(janitor)
+<span style="color:#a6e22e">library</span>(vroom)
+<span style="color:#a6e22e">library</span>(mosaic)
+<span style="color:#a6e22e">library</span>(car)
+<span style="color:#a6e22e">library</span>(kableExtra)
+<span style="color:#a6e22e">library</span>(ggthemes)
+<span style="color:#a6e22e">library</span>(huxtable)
+<span style="color:#a6e22e">library</span>(broom)
+<span style="color:#a6e22e">library</span>(moderndive)
+
+listings <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">vroom</span>(<span style="color:#e6db74">&#34;http://data.insideairbnb.com/china/beijing/beijing/2020-06-19/data/listings.csv.gz&#34;</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">clean_names</span>()
+</code></pre></div><h1 id="exploratory-data-analysis">Exploratory Data Analysis</h1>
+<h2 id="looking-at-the-raw-data">Looking at the raw data</h2>
+<p>Next we used <code>glimpse</code> to look at the raw data. The dataset consists of 36,283 observations and 106 variables. There are logical, character, date and numerical variables in the dataset.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">glimpse</span>(listings)
+</code></pre></div><pre><code>## Rows: 36,283
+## Columns: 106
+## $ id                                           &lt;dbl&gt; 44054, 100213, 114384, 1…
+## $ listing_url                                  &lt;chr&gt; &quot;https://www.airbnb.com/…
+## $ scrape_id                                    &lt;dbl&gt; 2.02e+13, 2.02e+13, 2.02…
+## $ last_scraped                                 &lt;date&gt; 2020-06-20, 2020-06-20,…
+## $ name                                         &lt;chr&gt; &quot;Modern and Comfortable …
+## $ summary                                      &lt;chr&gt; &quot;East Apartments offers …
+## $ space                                        &lt;chr&gt; &quot;East Apartments is a we…
+## $ description                                  &lt;chr&gt; &quot;East Apartments offers …
+## $ experiences_offered                          &lt;chr&gt; &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, …
+## $ neighborhood_overview                        &lt;chr&gt; &quot;The neighborhood is a p…
+## $ notes                                        &lt;chr&gt; &quot;*For long term reservat…
+## $ transit                                      &lt;chr&gt; &quot;The easiest method to g…
+## $ access                                       &lt;chr&gt; &quot;*Guests have access to …
+## $ interaction                                  &lt;chr&gt; NA, NA, &quot;Helen和Wendy会全程为…
+## $ house_rules                                  &lt;chr&gt; &quot;Registration All guests…
+## $ thumbnail_url                                &lt;lgl&gt; NA, NA, NA, NA, NA, NA, …
+## $ medium_url                                   &lt;lgl&gt; NA, NA, NA, NA, NA, NA, …
+## $ picture_url                                  &lt;chr&gt; &quot;https://a0.muscache.com…
+## $ xl_picture_url                               &lt;lgl&gt; NA, NA, NA, NA, NA, NA, …
+## $ host_id                                      &lt;dbl&gt; 192875, 527062, 533062, …
+## $ host_url                                     &lt;chr&gt; &quot;https://www.airbnb.com/…
+## $ host_name                                    &lt;chr&gt; &quot;East Apartments&quot;, &quot;Joe&quot;…
+## $ host_since                                   &lt;date&gt; 2010-08-06, 2011-04-22,…
+## $ host_location                                &lt;chr&gt; &quot;Beijing, Beijing, China…
+## $ host_about                                   &lt;chr&gt; &quot;Hi everyone!  My name i…
+## $ host_response_time                           &lt;chr&gt; &quot;within an hour&quot;, &quot;N/A&quot;,…
+## $ host_response_rate                           &lt;chr&gt; &quot;100%&quot;, &quot;N/A&quot;, &quot;100%&quot;, &quot;…
+## $ host_acceptance_rate                         &lt;chr&gt; &quot;95%&quot;, &quot;N/A&quot;, &quot;100%&quot;, &quot;1…
+## $ host_is_superhost                            &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ host_thumbnail_url                           &lt;chr&gt; &quot;https://a0.muscache.com…
+## $ host_picture_url                             &lt;chr&gt; &quot;https://a0.muscache.com…
+## $ host_neighbourhood                           &lt;chr&gt; &quot;Shuangjing&quot;, NA, &quot;ITC&quot;,…
+## $ host_listings_count                          &lt;dbl&gt; 5, 4, 5, 5, 1, 7, 7, 6, …
+## $ host_total_listings_count                    &lt;dbl&gt; 5, 4, 5, 5, 1, 7, 7, 6, …
+## $ host_verifications                           &lt;chr&gt; &quot;['email', 'phone', 'fac…
+## $ host_has_profile_pic                         &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, …
+## $ host_identity_verified                       &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ street                                       &lt;chr&gt; &quot;Beijing, Beijing, China…
+## $ neighbourhood                                &lt;chr&gt; &quot;Chaoyang&quot;, NA, &quot;ITC&quot;, &quot;…
+## $ neighbourhood_cleansed                       &lt;chr&gt; &quot;朝阳区 / Chaoyang&quot;, &quot;密云县 /…
+## $ neighbourhood_group_cleansed                 &lt;lgl&gt; NA, NA, NA, NA, NA, NA, …
+## $ city                                         &lt;chr&gt; &quot;Beijing&quot;, &quot;Beijing&quot;, &quot;B…
+## $ state                                        &lt;chr&gt; &quot;Beijing&quot;, &quot;Beijing&quot;, &quot;B…
+## $ zipcode                                      &lt;dbl&gt; 100022, 101508, NA, 1000…
+## $ market                                       &lt;chr&gt; &quot;Beijing&quot;, &quot;Other (Inter…
+## $ smart_location                               &lt;chr&gt; &quot;Beijing, China&quot;, &quot;Beiji…
+## $ country_code                                 &lt;chr&gt; &quot;CN&quot;, &quot;CN&quot;, &quot;CN&quot;, &quot;CN&quot;, …
+## $ country                                      &lt;chr&gt; &quot;China&quot;, &quot;China&quot;, &quot;China…
+## $ latitude                                     &lt;dbl&gt; 39.9, 40.7, 39.9, 39.9, …
+## $ longitude                                    &lt;dbl&gt; 116, 117, 116, 116, 116,…
+## $ is_location_exact                            &lt;lgl&gt; TRUE, TRUE, TRUE, FALSE,…
+## $ property_type                                &lt;chr&gt; &quot;Serviced apartment&quot;, &quot;G…
+## $ room_type                                    &lt;chr&gt; &quot;Entire home/apt&quot;, &quot;Priv…
+## $ accommodates                                 &lt;dbl&gt; 9, 2, 2, 2, 3, 2, 4, 2, …
+## $ bathrooms                                    &lt;dbl&gt; 2, 1, 1, 1, 1, 1, 1, 1, …
+## $ bedrooms                                     &lt;dbl&gt; 3, 1, 1, 1, 1, 1, 1, 1, …
+## $ beds                                         &lt;dbl&gt; 4, 1, 1, 1, 2, 1, 2, 1, …
+## $ bed_type                                     &lt;chr&gt; &quot;Real Bed&quot;, &quot;Real Bed&quot;, …
+## $ amenities                                    &lt;chr&gt; &quot;{TV,\&quot;Cable TV\&quot;,Intern…
+## $ square_feet                                  &lt;dbl&gt; 1464, NA, NA, NA, 323, N…
+## $ price                                        &lt;chr&gt; &quot;$835.00&quot;, &quot;$1,203.00&quot;, …
+## $ weekly_price                                 &lt;chr&gt; &quot;$8,373.00&quot;, &quot;$7,200.00&quot;…
+## $ monthly_price                                &lt;chr&gt; &quot;$27,603.00&quot;, &quot;$28,800.0…
+## $ security_deposit                             &lt;chr&gt; &quot;$708.00&quot;, &quot;$0.00&quot;, NA, …
+## $ cleaning_fee                                 &lt;chr&gt; &quot;$71.00&quot;, &quot;$0.00&quot;, NA, &quot;…
+## $ guests_included                              &lt;dbl&gt; 6, 1, 1, 1, 2, 1, 1, 2, …
+## $ extra_people                                 &lt;chr&gt; &quot;$71.00&quot;, &quot;$0.00&quot;, &quot;$0.0…
+## $ minimum_nights                               &lt;dbl&gt; 2, 1, 1, 1, 3, 1, 1, 1, …
+## $ maximum_nights                               &lt;dbl&gt; 365, 30, 730, 1125, 365,…
+## $ minimum_minimum_nights                       &lt;dbl&gt; 2, 1, 1, 1, 3, 1, 1, 1, …
+## $ maximum_minimum_nights                       &lt;dbl&gt; 2, 1, 1, 1, 3, 1, 1, 1, …
+## $ minimum_maximum_nights                       &lt;dbl&gt; 365, 30, 730, 1125, 365,…
+## $ maximum_maximum_nights                       &lt;dbl&gt; 365, 30, 730, 1125, 365,…
+## $ minimum_nights_avg_ntm                       &lt;dbl&gt; 2, 1, 1, 1, 3, 1, 1, 1, …
+## $ maximum_nights_avg_ntm                       &lt;dbl&gt; 365, 30, 730, 1125, 365,…
+## $ calendar_updated                             &lt;chr&gt; &quot;5 months ago&quot;, &quot;27 mont…
+## $ has_availability                             &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, …
+## $ availability_30                              &lt;dbl&gt; 19, 0, 19, 19, 19, 2, 0,…
+## $ availability_60                              &lt;dbl&gt; 49, 0, 49, 49, 49, 2, 0,…
+## $ availability_90                              &lt;dbl&gt; 79, 0, 79, 79, 79, 2, 0,…
+## $ availability_365                             &lt;dbl&gt; 354, 0, 354, 354, 169, 2…
+## $ calendar_last_scraped                        &lt;date&gt; 2020-06-20, 2020-06-20,…
+## $ number_of_reviews                            &lt;dbl&gt; 99, 2, 66, 10, 290, 26, …
+## $ number_of_reviews_ltm                        &lt;dbl&gt; 7, 0, 1, 1, 22, 0, 2, 0,…
+## $ first_review                                 &lt;date&gt; 2010-08-25, 2017-08-27,…
+## $ last_review                                  &lt;date&gt; 2020-01-06, 2017-10-08,…
+## $ review_scores_rating                         &lt;dbl&gt; 91, 100, 93, 98, 97, 77,…
+## $ review_scores_accuracy                       &lt;dbl&gt; 9, 10, 10, 9, 10, 8, 8, …
+## $ review_scores_cleanliness                    &lt;dbl&gt; 8, 9, 9, 9, 10, 7, 7, 8,…
+## $ review_scores_checkin                        &lt;dbl&gt; 10, 10, 10, 9, 10, 9, 9,…
+## $ review_scores_communication                  &lt;dbl&gt; 10, 10, 10, 10, 10, 9, 9…
+## $ review_scores_location                       &lt;dbl&gt; 10, 9, 10, 10, 10, 9, 9,…
+## $ review_scores_value                          &lt;dbl&gt; 9, 9, 10, 9, 10, 8, 9, 8…
+## $ requires_license                             &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ license                                      &lt;chr&gt; NA, NA, &quot;Exempt&quot;, &quot;Exemp…
+## $ jurisdiction_names                           &lt;lgl&gt; NA, NA, NA, NA, NA, NA, …
+## $ instant_bookable                             &lt;lgl&gt; FALSE, TRUE, TRUE, TRUE,…
+## $ is_business_travel_ready                     &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ cancellation_policy                          &lt;chr&gt; &quot;strict_14_with_grace_pe…
+## $ require_guest_profile_picture                &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ require_guest_phone_verification             &lt;lgl&gt; FALSE, FALSE, FALSE, FAL…
+## $ calculated_host_listings_count               &lt;dbl&gt; 5, 4, 5, 5, 1, 5, 5, 6, …
+## $ calculated_host_listings_count_entire_homes  &lt;dbl&gt; 5, 0, 5, 5, 1, 5, 5, 5, …
+## $ calculated_host_listings_count_private_rooms &lt;dbl&gt; 0, 3, 0, 0, 0, 0, 0, 1, …
+## $ calculated_host_listings_count_shared_rooms  &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 0, 0, …
+## $ reviews_per_month                            &lt;dbl&gt; 0.83, 0.06, 0.73, 0.11, …
+</code></pre><h2 id="computing-summary-statistics-of-the-variables-of-interest">Computing summary statistics of the variables of interest</h2>
+<p>To get a better sense of the distribution of each variable we use the skim function from the skimr package. We see that most of the variables are of numeric(40) and character(46) types with a few logical (15) and 5 date variables. Looking at the histograms of the numeric variables we notice that the <code>review_scores</code> variables are left skewed indicating that the majority of AirBnBs have very high ratings in this dataset. Secondly, we noticed that some of the variables such as <code>beds</code>, <code>bedrooms</code>, <code>minimum_nights</code>, <code>bathrooms</code>, <code>accommodates</code>, and <code>number_of_reviews</code> are right skewed and have outliers. Finally, certain numeric variables like <code>price</code> and <code>host_response_rate</code> are stored as characters in this dataset. We will need to convert them into numeric type in order to use them in later visualizations and in the regression analysis.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">skimr<span style="color:#f92672">::</span><span style="color:#a6e22e">skim</span>(listings)
+</code></pre></div><!-- raw HTML omitted -->
+<p><strong>Variable type: character</strong></p>
+<!-- raw HTML omitted -->
+<p><strong>Variable type: Date</strong></p>
+<!-- raw HTML omitted -->
+<p><strong>Variable type: logical</strong></p>
+<!-- raw HTML omitted -->
+<p><strong>Variable type: numeric</strong></p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#using favstats from the mosaic package to display summary stats for some variables of interest</span>
+<span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>bedrooms, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>bathrooms, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>beds, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>accommodates, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>number_of_reviews, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">favstats</span>(<span style="color:#f92672">~</span>minimum_nights, data<span style="color:#f92672">=</span> listings)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h2 id="cleaning-data">Cleaning data</h2>
+<p>In the following code blocks we will :</p>
+<ul>
+<li>List and remove static and irrelevant columns</li>
+<li>Replace &ldquo;N/A&rdquo; values by NA</li>
+<li>Create a new variable property_type_simplified that keeps only the first 4 most occuring property types and groups everything else under &ldquo;Other&rdquo;</li>
+<li>Convert <code>price</code>, <code>weekly_price</code>, <code>monthly_price</code>, <code>security_deposit</code>, <code>cleaning_fee</code>, <code>extra_people</code>, <code>host_response_rate</code>, <code>host_acceptance_rate</code> into numeric format</li>
+<li>Create a new variable <code>host_since</code> that calculates the number of years a host has been with AirBnB and stores it in a ordered factor</li>
+<li>Convert the categorical variables into factors</li>
+<li>Convert all NA values in variable <code>cleaning_fee</code> to 0. We assume that if the cleaning fee is missing it must be included in the rent</li>
+<li>Remove AirBnBs which have minimum_nights&gt;4. The dataset contains some listings which require guests to stay a minimum of 30+ days. These will mostly cater to students on internship and non-tourists going to Beijing for a  few months of work. Our purpose in this project is to predict the price of two people staying for 4 nights. Hence, we excluded every listing with <code>minimum_nights</code>&gt;4. The most common value for minimum nights is 1.</li>
+<li>Group the <code>neighbourhood_cleansed</code> variable into smaller groups based on distance from city center. We call the new variable <code>neighbourhood_simplified</code>.</li>
+<li>Create a new list of variables named <code>has_tv</code>, <code>has_wifi</code> etc.that is true if the Airbnb has the amenity and false if not. These variables were created from the amenities column on the original dataset. We join this to the dataset <code>listings_cleaned</code></li>
+<li>Calculate the price for two people staying in an Airbnb for 4 nights and store it in the variable <code>price_4_nights</code>. We include the charge for an extra person if the Airbnb price includes only one guest. After having created a density plot we discovered that the <code>price_4_nights</code> variable is right skewed and hence we will use the log of price_4_nights in our regression analysis.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#List irrelevant columns</span>
+irrelevant_columns <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;summary&#34;</span>, <span style="color:#e6db74">&#34;name&#34;</span>, <span style="color:#e6db74">&#34;space&#34;</span>, <span style="color:#e6db74">&#34;description&#34;</span>, 
+                       <span style="color:#e6db74">&#34;neighborhood_overview&#34;</span>, <span style="color:#e6db74">&#34;notes&#34;</span>, <span style="color:#e6db74">&#34;transit&#34;</span>, 
+                       <span style="color:#e6db74">&#34;access&#34;</span>, <span style="color:#e6db74">&#34;interaction&#34;</span>, <span style="color:#e6db74">&#34;house_rules&#34;</span>, 
+                       <span style="color:#e6db74">&#34;thumbnail_url&#34;</span>, <span style="color:#e6db74">&#34;medium_url&#34;</span>, <span style="color:#e6db74">&#34;picture_url&#34;</span>, 
+                       <span style="color:#e6db74">&#34;xl_picture_url&#34;</span>, <span style="color:#e6db74">&#34;host_id&#34;</span>, <span style="color:#e6db74">&#34;host_url&#34;</span>, 
+                       <span style="color:#e6db74">&#34;host_name&#34;</span>, <span style="color:#e6db74">&#34;host_thumbnail_url&#34;</span>, 
+                       <span style="color:#e6db74">&#34;host_picture_url&#34;</span>, <span style="color:#e6db74">&#34;scrape_id&#34;</span>, <span style="color:#e6db74">&#34;last_scraped&#34;</span>, 
+                       <span style="color:#e6db74">&#34;host_about&#34;</span>, <span style="color:#e6db74">&#34;street&#34;</span>, <span style="color:#e6db74">&#34;neighbourhood_group_cleansed&#34;</span>, 
+                       <span style="color:#e6db74">&#34;calendar_last_scraped&#34;</span>)
+
+
+<span style="color:#75715e">#Replace &#34;N/A&#34; in dataframe by NA values</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate_if</span>(is.character, <span style="color:#a6e22e">funs</span>(<span style="color:#a6e22e">na_if</span>(., <span style="color:#e6db74">&#34;N/A&#34;</span>)))
+
+<span style="color:#75715e">#Only keep rows with less than 50% of NAs</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned<span style="color:#a6e22e">[rowSums</span>(<span style="color:#a6e22e">is.na</span>(listings_cleaned)) <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">ncol</span>(listings_cleaned)<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>, ]
+
+<span style="color:#75715e">#List static columns</span>
+static_columns <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">summarise_all</span>(n_distinct)
+static_columns <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">names</span>(static_columns)<span style="color:#a6e22e">[which</span>(static_columns[1,] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)]
+
+<span style="color:#75715e">#listing the most common property types</span>
+listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(property_type) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">summarise</span>(count<span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>()) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">arrange</span>(<span style="color:#a6e22e">desc</span>(count)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">head</span>(<span style="color:#ae81ff">4</span>)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#simplifying the property variable i.e grouping into 5 types</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(prop_type_simplified <span style="color:#f92672">=</span> <span style="color:#a6e22e">case_when</span>(
+    property_type <span style="color:#f92672">%in%</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Apartment&#34;</span>,<span style="color:#e6db74">&#34;Condominium&#34;</span>, <span style="color:#e6db74">&#34;House&#34;</span>,<span style="color:#e6db74">&#34;Loft&#34;</span>) <span style="color:#f92672">~</span> property_type, 
+    <span style="color:#66d9ef">TRUE</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Other&#34;</span>
+  ))
+
+<span style="color:#75715e">#Remove unnecessary columns and reformat</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span><span style="color:#a6e22e">unique</span>(<span style="color:#a6e22e">c</span>(irrelevant_columns, static_columns))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(
+    <span style="color:#75715e">#Put price, weekly_price, monthly_price, security_deposit, cleaning_fee, extra_people, </span>
+    <span style="color:#75715e">#host_response_rate, host_acceptance_rate in numeric format</span>
+    price <span style="color:#f92672">=</span> <span style="color:#a6e22e">parse_number</span>(price),
+    weekly_price<span style="color:#f92672">=</span><span style="color:#a6e22e">parse_number</span>(weekly_price),
+    monthly_price<span style="color:#f92672">=</span><span style="color:#a6e22e">parse_number</span>(monthly_price),
+    security_deposit<span style="color:#f92672">=</span><span style="color:#a6e22e">parse_number</span>(security_deposit),
+    cleaning_fee<span style="color:#f92672">=</span><span style="color:#a6e22e">parse_number</span>(cleaning_fee),
+    extra_people<span style="color:#f92672">=</span><span style="color:#a6e22e">parse_number</span>(extra_people),
+    <span style="color:#75715e">#Extract number from character ignoring the percentage sign</span>
+    host_response_rate <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">gsub</span>(<span style="color:#e6db74">&#34;%&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, host_response_rate)), 
+    host_acceptance_rate <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">gsub</span>(<span style="color:#e6db74">&#34;%&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, host_acceptance_rate)), 
+    <span style="color:#75715e">#Convert host_since, first_review and last_review date variables to numeric using number of days</span>
+    <span style="color:#75715e">#For host_since classify in 5 categories using the number of days since the host joined AirBnb</span>
+    host_since <span style="color:#f92672">=</span> <span style="color:#a6e22e">case_when</span>(
+      <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(host_since)) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">365</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Less 1 year&#34;</span>, 
+      <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(host_since)) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">730</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;1-2 years&#34;</span>, 
+      <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(host_since)) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1095</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;2-3 years&#34;</span>, 
+      <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(host_since)) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1460</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;3-4 years&#34;</span>, 
+      <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(host_since)) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1460</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;More 4 years&#34;</span>), 
+    first_review <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(first_review)), 
+    last_review <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">Sys.Date</span>() <span style="color:#f92672">-</span> <span style="color:#a6e22e">as.Date</span>(last_review)))
+
+
+<span style="color:#75715e">#Transform categorical variables to factors</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(
+    <span style="color:#75715e">#Unordered factors</span>
+    host_location <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(host_location), 
+    host_neighbourhood <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(host_neighbourhood), 
+    city <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(city), 
+    state <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(state), 
+    market <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(market), 
+    smart_location <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(smart_location), 
+    property_type <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(property_type), 
+    room_type <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(room_type), 
+    bed_type <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(bed_type), 
+    cancellation_policy <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(cancellation_policy), 
+    prop_type_simplified <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(prop_type_simplified),
+    zipcode <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(zipcode), 
+    <span style="color:#75715e">#Ordered factors for host_response_time and host_since</span>
+    host_response_time <span style="color:#f92672">=</span> <span style="color:#a6e22e">ordered</span>(host_response_time, 
+                                 levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;within an hour&#34;</span>, <span style="color:#e6db74">&#34;within a few hours&#34;</span>, 
+                                            <span style="color:#e6db74">&#34;within a day&#34;</span>, <span style="color:#e6db74">&#34;a few days or more&#34;</span>)), 
+    host_since <span style="color:#f92672">=</span> <span style="color:#a6e22e">ordered</span>(host_since, 
+                         levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Less 1 year&#34;</span>, <span style="color:#e6db74">&#34;1-2 years&#34;</span>, <span style="color:#e6db74">&#34;2-3 years&#34;</span>, 
+                                    <span style="color:#e6db74">&#34;3-4 years&#34;</span>, <span style="color:#e6db74">&#34;More 4 years&#34;</span>)))
+
+
+<span style="color:#75715e">#We assume that missing cleaning fee implies cleaning fee is included in the rent</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(cleaning_fee <span style="color:#f92672">=</span> <span style="color:#a6e22e">case_when</span>(
+    <span style="color:#a6e22e">is.na</span>(cleaning_fee) <span style="color:#f92672">~</span> <span style="color:#ae81ff">0</span>, 
+    <span style="color:#66d9ef">TRUE</span> <span style="color:#f92672">~</span> cleaning_fee
+  ))
+
+<span style="color:#75715e">#viewing the distribution of the variable minimum_nights</span>
+listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(minimum_nights) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">summarise</span>(count<span style="color:#f92672">=</span><span style="color:#a6e22e">n</span>()) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">arrange</span>(<span style="color:#a6e22e">desc</span>(count)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">kbl</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">kable_classic_2</span>(full_width <span style="color:#f92672">=</span> F)
+</code></pre></div><!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#removing long term stay listings</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(minimum_nights<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">4</span>)
+
+<span style="color:#75715e">#Renaming some of the districts in Beijing to include names in both English and Chinese</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(neighbourhood_cleansed <span style="color:#f92672">=</span> (<span style="color:#a6e22e">case_when</span>(
+    neighbourhood_cleansed<span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;东城区&#34;</span> <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;东城区 / Dongcheng&#34;</span>,
+    neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;房山区&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;房山区 / Fangshan&#34;</span>,
+    neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;昌平区&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;昌平区 / Changping&#34;</span>,
+    neighbourhood_cleansed<span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;海淀区&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;海淀区 / Haidian&#34;</span>,
+    neighbourhood_cleansed<span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;石景山区&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;石景山区 / Shijingshan&#34;</span>,
+    neighbourhood_cleansed<span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;西城区&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;西城区 / Xicheng&#34;</span>,
+    <span style="color:#66d9ef">TRUE</span> <span style="color:#f92672">~</span> neighbourhood_cleansed)),
+    <span style="color:#75715e">#Grouping districts into 4 zones</span>
+    neighbourhood_simplified <span style="color:#f92672">=</span> (<span style="color:#a6e22e">case_when</span>(
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;东城区 / Dongcheng&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 1&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;西城区 / Xicheng&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 1&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;丰台区 / Fengtai&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 2&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;海淀区 / Haidian&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 2&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;石景山区 / Shijingshan&#34;</span><span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Zone 2&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;朝阳区 / Chaoyang&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 2&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;昌平区 / Changping&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span><span style="color:#e6db74">&#34;大兴区 / Daxing&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;房山区 / Fangshan&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;顺义区 / Shunyi&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;门头沟区 / Mentougou&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;通州区 / Tongzhou&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 3&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;密云县 / Miyun&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 4&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;平谷区 / Pinggu&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 4&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;怀柔区 / Huairou&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 4&#34;</span>,
+      neighbourhood_cleansed <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;延庆县 / Yanqing&#34;</span><span style="color:#f92672">~</span><span style="color:#e6db74">&#34;Zone 4&#34;</span>)))
+
+<span style="color:#75715e">#Creating a boolean variable, set to true if host is member since more than 4 years</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(is_host_plus_4<span style="color:#f92672">=</span> <span style="color:#a6e22e">ifelse</span>(host_since<span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;More 4 years&#34;</span>, <span style="color:#66d9ef">TRUE</span>,<span style="color:#66d9ef">FALSE</span>)
+  )
+
+<span style="color:#75715e">#Create dataframe with boolean variables for each type of amenity</span>
+<span style="color:#75715e">#The variables are created if the amenities column contains the amenity name </span>
+amenities_df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data.frame</span>(id <span style="color:#f92672">=</span> listings<span style="color:#f92672">$</span>id, 
+                           has_tv <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;TV&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_wifi <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Wifi&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_elevator <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Elevator&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_washer <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Washer&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_pets_allowed <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Pets allowed&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_breakfast <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Breakfast&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_patio_or_balcony <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Patio or balcony&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_garden <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Garden&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_parking <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Free parking on premises&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">|</span> 
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Paid parking off premises&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">|</span> 
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Paid parking on premises&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">|</span> 
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Free street parking&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>), 
+                           has_wheelchair_access <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Wheelchair accessible&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>),
+                           has_dishwasher <span style="color:#f92672">=</span> <span style="color:#a6e22e">if_else</span>(
+                             <span style="color:#a6e22e">str_count</span>(listings<span style="color:#f92672">$</span>amenities, <span style="color:#e6db74">&#34;Dishwasher&#34;</span>) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">TRUE</span>, <span style="color:#66d9ef">FALSE</span>))
+
+<span style="color:#75715e">#Joining the amenities_df with the listings_cleaned dataframe</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">left_join</span>(listings_cleaned, amenities_df, by <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;id&#34;</span>)
+
+
+<span style="color:#75715e">#Calculating the price of renting an airbnb for 4 nights </span>
+<span style="color:#75715e">#The price is equal to 4*daily rate + cleaning fee if guests_included &gt;= 2</span>
+<span style="color:#75715e">#If guests_included &lt; 2 then we add 4*extra_people fee</span>
+listings_cleaned <span style="color:#f92672">&lt;-</span> 
+  listings_cleaned <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e">#Removing listing with null prices as we will take the logarithm of price</span>
+  <span style="color:#a6e22e">filter</span>(price <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(price_4_nights <span style="color:#f92672">=</span> 
+           <span style="color:#ae81ff">4</span><span style="color:#f92672">*</span>(price <span style="color:#f92672">+</span> <span style="color:#a6e22e">ifelse</span>(guests_included <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, extra_people)) <span style="color:#f92672">+</span> cleaning_fee
+         )
+
+
+<span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(x<span style="color:#f92672">=</span>price_4_nights))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_density</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Distribution of Price for 4 nights (Right Skewed)&#34;</span>,
+    x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights&#34;</span>
+  ) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">listings_cleaned <span style="color:#f92672">&lt;-</span> listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#75715e">#We take the log since the data is right skewed</span>
+  <span style="color:#a6e22e">mutate</span>(price_4_nights <span style="color:#f92672">=</span> <span style="color:#a6e22e">log</span>(price_4_nights <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.001</span>)) 
+
+
+<span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> price_4_nights))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_density</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Distribution of log(Price for 4 nights)&#34;</span>,
+    x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  ) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<h2 id="creating-informative-visualizations">Creating informative visualizations</h2>
+<p>First, let&rsquo;s create boxplots to visualise the distribution between some of the categorical variables and price_4_nights.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>room_type))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_boxplot</span>()<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_flip</span>()<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Type of Room&#34;</span>,
+    x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Room Type&#34;</span>,
+    y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  ) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>From the graph above we can clearly see that the median price of entire apartments is higher than private rooms while both are higher than the median price of shared rooms.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>neighbourhood_simplified))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_boxplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_flip</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Neighbourhood Zone&#34;</span>,
+    x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Neighbourhood Zone&#34;</span>,
+    y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  ) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>Properties in zone 4 (districts Miyun, Pinggu, Huairou, Yanqing)  appear to have a higher median price followed by zone 1, 2 and 3. Although zone 4 is in the outskirts of Beijing, these districts are popular among tourists (the great wall of China passes through the Huairou district) and this might explain why Airbnbs are priced higher in these districts.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>has_breakfast))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_boxplot</span>()<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights for Airbnbs that serve breakfast vs those that do not.&#34;</span>,
+    x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Airbnb has breakfast?&#34;</span>,
+    y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  )<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>From the graph above one can see that the median price of Airbnbs that serve breakfast is higher than those that do not.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(host_is_superhost)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>host_is_superhost))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_boxplot</span>()<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights for Airbnbs with superhosts compared to regular hosts&#34;</span>,
+    x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Host is superhost?&#34;</span>,
+    y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  )<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>Also, we see that the median price for Airbnbs with superhosts is very slightly higher than those with regular hosts.</p>
+<p>Next we will create a correlation scatterplot of some of the numerical variables in the dataset.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Using ggpairs to explore the relationship between some numeric variables of interest</span>
+listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">select</span>(price_4_nights, number_of_reviews, review_scores_rating, host_acceptance_rate, 
+         host_response_time, guests_included) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">ggpairs</span>(<span style="color:#a6e22e">aes</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>None of the numerical variables taken above correlate highly with price but some of them like <code>number_of_reviews</code> and <code>review_score_rating</code> have a significant relationship with price. We will include some of these variables in our model and see what affect they have on price.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Using ggpairs to create a correlation scatterplot for some numeric variables of interest</span>
+listings_cleaned <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">select</span>(price_4_nights, accommodates, bedrooms, bathrooms, beds, has_breakfast) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">ggpairs</span>(<span style="color:#a6e22e">aes</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, color<span style="color:#f92672">=</span> has_breakfast))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>The variables <code>bedrooms</code>, <code>bathrooms</code> and <code>accommodates</code> have a moderate correlation with price. Later, in the regression analysis section we will explore their relationship further.</p>
+<p>Now let&rsquo;s create a few scatterplots to visualise the distribution of some numeric variables with price.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Scatterplot of price_4_nights vs number of reviews</span>
+<span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>number_of_reviews))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lm&#39;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_log10</span>()<span style="color:#f92672">+</span>
+<span style="color:#a6e22e">labs</span>(
+  title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Number of Reviews&#34;</span>,
+  x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Number of Reviews&#34;</span>,
+  y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+)<span style="color:#f92672">+</span><span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>From the scatterplot we can see that price seems to decrease slightly as the number of reviews goes up.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Scatterplot of price_4_nights vs accommodates</span>
+<span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>accommodates))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lm&#39;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Number of guests accommodated&#34;</span>,
+    x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Number of guests accommodated&#34;</span>,
+    y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  )<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>Price of the Airbnb goes up as the number of people it can accommodate increases.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span>bedrooms))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lm&#39;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Number of bedrooms&#34;</span>,
+    x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Number of bedrooms&#34;</span>,
+    y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  )<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(listings_cleaned, <span style="color:#a6e22e">aes</span>(y<span style="color:#f92672">=</span> price_4_nights, x<span style="color:#f92672">=</span> review_scores_rating))<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.3</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(method<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lm&#39;</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(
+    title<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Price for 4 nights vs Review Scores Rating&#34;</span>,
+    x<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Review scores rating&#34;</span>,
+    y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;log(Price for 4 nights)&#34;</span>
+  )<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<h1 id="mapping">Mapping</h1>
+<p>Visualising the distribution of Airbnbs geographically in Beijing will help us to identify the regions and districts in which they are most prevalent. We used the leaflet package which is one of the most widely used open-source JavaScript libraries for interactive mapping. In our visualisation we can see that most Airbnbs are clustered in the city center (Zone 1 in our simplified grouping) and in the districts north of the city (Zone 4). As stated earlier, districts in zone 4 are popular for tourists which might explain why there are quite a few Airbnbs in the nothern suburbs of the city.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">leaflet</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">filter</span>(listings_cleaned)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">addProviderTiles</span>(<span style="color:#e6db74">&#34;OpenStreetMap.Mapnik&#34;</span>) <span style="color:#f92672">%&gt;%</span> <span style="color:#75715e">#Adding third-party tile provider</span>
+  <span style="color:#a6e22e">addCircleMarkers</span>(lng <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>longitude, 
+                   lat <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>latitude, 
+                   radius <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, 
+                   fillColor <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;blue&#34;</span>, 
+                   fillOpacity <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.4</span>, 
+                   popup <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>listing_url,
+                   label <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>property_type)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h1 id="regression-analysis">Regression Analysis</h1>
+<p>We will be doing a regression analysis with <code>price_4_nights</code> as the target variable or Y. We have already done the logarithmic transformation of <code>price_4_nights</code> to account for the outliers that were making the distribution right skewed. Without doing a logarithmic transformation, our regression models failed to explain most of the variability in <code>price_4_nights</code>. In our first model we will run a regression with <code>prop_type_simplified</code>,<code>number_of_reviews</code> and <code>review_scores_rating</code>as the explanatory variables.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights <span style="color:#f92672">~</span> prop_type_simplified<span style="color:#f92672">+</span>
+               number_of_reviews<span style="color:#f92672">+</span>
+               review_scores_rating, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model1)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model1)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model1) <span style="color:#75715e">#Calculating the variance inflation factor for model1</span>
+</code></pre></div><pre><code>##                      GVIF Df GVIF^(1/(2*Df))
+## prop_type_simplified 1.01  4            1.00
+## number_of_reviews    1.01  1            1.01
+## review_scores_rating 1.01  1            1.00
+</code></pre><p>We can see that keeping other variables in the model constant, compared to apartments, condominiums are priced slighly lower. All other property types will be priced slightly higher than apartments. The coefficient of the variable <code>review_scores_rating</code> indicates that after controlling for all other variables, Airbnbs with higher ratings have a higher price. All variables are significant predictors of price since their test statistics are greater than 2. However, the adjusted R Squared value for our first model is only 7.1 % indicating that these variables alone do not explain much of the variability in price. We computed the Variance Inflation Factor (VIF) for our model and observe that it doesn&rsquo;t suffer from multicollinearity as the VIF is less than 5 for all variables.</p>
+<p>Next we will see if room_type has any significant effect on our model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights <span style="color:#f92672">~</span> prop_type_simplified<span style="color:#f92672">+</span>
+               number_of_reviews<span style="color:#f92672">+</span>
+               review_scores_rating<span style="color:#f92672">+</span>
+               room_type, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model2)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model1)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model2) <span style="color:#75715e">#Calculating the variance inflation factor for model2</span>
+</code></pre></div><pre><code>##                      GVIF Df GVIF^(1/(2*Df))
+## prop_type_simplified 1.04  4            1.01
+## number_of_reviews    1.01  1            1.01
+## review_scores_rating 1.01  1            1.00
+## room_type            1.04  2            1.01
+</code></pre><p>Room type does not improve our model but is a significant predictor of price. It is not collinear with our other variables as the VIF is still less than 5.</p>
+<p>In the visualisations above we saw that the variables <code>bedrooms</code>, <code>bathrooms</code> and <code>accommodates</code> have a moderate correlation with price. This logically makes sense since larger Airbnbs tend to accomodate more guests and cost a higher price. We will look at the effect of these variables on our model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#checking if bedroom, bathroom and beds are good predictors of price_4_nights</span>
+model3 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights<span style="color:#f92672">~</span> prop_type_simplified<span style="color:#f92672">+</span>
+               number_of_reviews<span style="color:#f92672">+</span>
+               review_scores_rating<span style="color:#f92672">+</span>
+               room_type<span style="color:#f92672">+</span>
+               bedrooms<span style="color:#f92672">+</span>
+               bathrooms<span style="color:#f92672">+</span>
+               beds<span style="color:#f92672">+</span>
+               accommodates, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model3)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model3)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model3) <span style="color:#75715e">#Calculating the variance inflation factor for model3</span>
+</code></pre></div><pre><code>##                      GVIF Df GVIF^(1/(2*Df))
+## prop_type_simplified 1.15  4            1.02
+## number_of_reviews    1.02  1            1.01
+## review_scores_rating 1.01  1            1.01
+## room_type            1.26  2            1.06
+## bedrooms             4.40  1            2.10
+## bathrooms            1.62  1            1.27
+## beds                 3.12  1            1.77
+## accommodates         4.44  1            2.11
+</code></pre><p>The addition of these variables vastly improves our adjusted R squared value to about 51 %. Since the variables <code>bedrooms</code>, <code>bathrooms</code> and <code>accommodates</code> are moderately correlated with each other we calculated the variance inflation factor of the model to check if any of the variables are collinear. We observe that &lsquo;bedrooms&rsquo; and &lsquo;accommodates&rsquo; have the highest VIF. This makes sense as the guests capacity (&lsquo;accommodates&rsquo;) of an apartment is determined by the number of &lsquo;beds&rsquo; and &lsquo;bedrooms&rsquo;. However, since the VIF for all variables is below 5 we conclude that the model does not suffer from collinearity.</p>
+<p>Next we will explore the effect of the variable <code>host_is_superhost</code> on price.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Adding host_is_superhost to the model</span>
+model4 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights<span style="color:#f92672">~</span> host_is_superhost<span style="color:#f92672">+</span>
+               room_type<span style="color:#f92672">+</span>
+               prop_type_simplified<span style="color:#f92672">+</span>
+               number_of_reviews<span style="color:#f92672">+</span>
+               review_scores_rating<span style="color:#f92672">+</span>
+               bedrooms<span style="color:#f92672">+</span>
+               bathrooms<span style="color:#f92672">+</span>
+               beds<span style="color:#f92672">+</span>
+               accommodates, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model4)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model4)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model4) <span style="color:#75715e">#Calculating the variance inflation factor for model4</span>
+</code></pre></div><pre><code>##                      GVIF Df GVIF^(1/(2*Df))
+## host_is_superhost    1.12  1            1.06
+## room_type            1.26  2            1.06
+## prop_type_simplified 1.16  4            1.02
+## number_of_reviews    1.08  1            1.04
+## review_scores_rating 1.05  1            1.03
+## bedrooms             4.41  1            2.10
+## bathrooms            1.62  1            1.27
+## beds                 3.12  1            1.77
+## accommodates         4.44  1            2.11
+</code></pre><p>The addition of <code>host_is_superhost</code> does not significantly improve the adjusted R2 of our model but is a significant predictor of the price.
+As it is not collinear with the other variables (VIF &lt; 5), we decide to keep this variable in our model.</p>
+<p>Next we will add three more variables <code>is_location_exact</code>,<code>neighbourhood_simplified</code> and <code>cancellation_policy</code> to the model.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Adding cancellation_policy, neighbourhood_simplified and is_location_exact</span>
+
+model5 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights<span style="color:#f92672">~</span> host_is_superhost<span style="color:#f92672">+</span>
+               room_type<span style="color:#f92672">+</span>
+               prop_type_simplified<span style="color:#f92672">+</span>
+               number_of_reviews<span style="color:#f92672">+</span>
+               review_scores_rating<span style="color:#f92672">+</span>
+               bedrooms<span style="color:#f92672">+</span>
+               bathrooms<span style="color:#f92672">+</span>
+               beds<span style="color:#f92672">+</span>
+               accommodates<span style="color:#f92672">+</span>
+               is_location_exact<span style="color:#f92672">+</span>
+               neighbourhood_simplified<span style="color:#f92672">+</span>
+               cancellation_policy, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model4)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model4)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model5) <span style="color:#75715e">#Calculating the variance inflation factor for model5</span>
+</code></pre></div><pre><code>##                          GVIF Df GVIF^(1/(2*Df))
+## host_is_superhost        1.15  1            1.07
+## room_type                1.29  2            1.07
+## prop_type_simplified     1.49  4            1.05
+## number_of_reviews        1.15  1            1.07
+## review_scores_rating     1.06  1            1.03
+## bedrooms                 4.47  1            2.11
+## bathrooms                1.63  1            1.28
+## beds                     3.13  1            1.77
+## accommodates             4.57  1            2.14
+## is_location_exact        1.09  1            1.04
+## neighbourhood_simplified 1.66  3            1.09
+## cancellation_policy      1.09  2            1.02
+</code></pre><p>This improves our adjusted R2 value by ~3 percentage points. Also, all variables appear to be significant predictors of price. We also calculate the variance inflation factor to ensure that there is no collinearity in our model.</p>
+<p>In the final model we will add some variables that appeared to have an effect on price during our preliminary regression tests and exploratory data analysis. These variables include <code>has_breakfast</code> (does the Aribnb serve breakfast or not?), <code>reviews_per_month</code> (How many reviews did the Airbnb get per month?) and <code>is_host_4_plus</code> (Has the host been with Airbnb for more than 4 years?).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model6<span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(price_4_nights<span style="color:#f92672">~</span>room_type<span style="color:#f92672">+</span>
+              number_of_reviews<span style="color:#f92672">+</span>
+              neighbourhood_simplified<span style="color:#f92672">+</span>
+              has_breakfast<span style="color:#f92672">+</span>
+              accommodates<span style="color:#f92672">+</span>
+              host_is_superhost<span style="color:#f92672">+</span> 
+              review_scores_rating<span style="color:#f92672">+</span>
+              <span style="color:#75715e">#Variable indicating if the host has been with Airbnb for more than 4 years</span>
+              is_host_plus_4<span style="color:#f92672">+</span> 
+              prop_type_simplified<span style="color:#f92672">+</span>
+              beds<span style="color:#f92672">+</span>
+              bedrooms<span style="color:#f92672">+</span>
+              bathrooms<span style="color:#f92672">+</span>
+              cancellation_policy<span style="color:#f92672">+</span>
+              reviews_per_month, data<span style="color:#f92672">=</span> listings_cleaned)
+<span style="color:#a6e22e">get_regression_table</span>(model6)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">get_regression_summaries</span>(model6)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">vif</span>(model6) <span style="color:#75715e">#Calculating the variance inflation factor for model6</span>
+</code></pre></div><pre><code>##                          GVIF Df GVIF^(1/(2*Df))
+## room_type                1.34  2            1.08
+## number_of_reviews        3.20  1            1.79
+## neighbourhood_simplified 1.74  3            1.10
+## has_breakfast            1.18  1            1.09
+## accommodates             4.57  1            2.14
+## host_is_superhost        1.22  1            1.10
+## review_scores_rating     1.07  1            1.03
+## is_host_plus_4           1.14  1            1.07
+## prop_type_simplified     1.52  4            1.05
+## beds                     3.13  1            1.77
+## bedrooms                 4.48  1            2.12
+## bathrooms                1.64  1            1.28
+## cancellation_policy      1.09  2            1.02
+## reviews_per_month        3.31  1            1.82
+</code></pre><p>The final model achieved an adjusted R2 of around 54.7 %. All explanatory variables are significant (t-statistic&gt;2). We see that if an Airbnb has a host with more than 4 years of experience the price will be more than the same Airbnb(controlling for other variables) with a less experienced host.  Also, Airbnbs that serve breakfast will cost more than those that do not if all other aspects were the same.</p>
+<p>After adding &lsquo;is_host_plus_4&rsquo;, &lsquo;reviews_per_month&rsquo; and &lsquo;has_breakfast&rsquo; we notice that the VIF for &lsquo;number_of_reviews&rsquo; has increased. This effect is not surprising has the new variable &lsquo;reviews_per_month&rsquo; is obviously correlated with &lsquo;number_of_reviews&rsquo;.
+Finally, as the VIF is less than 5 for all our variables, we decide to move forward and use these features to predict the price of 4 nights in Beijing for 2 people.</p>
+<h1 id="regression-diagnostics">Regression Diagnostics</h1>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(grid)
+<span style="color:#a6e22e">library</span>(gridExtra)
+<span style="color:#75715e">#Creating autoplots for all 6 regression models</span>
+plot1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model1, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot1<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 1 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model2, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot2<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 2 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot3 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model3, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot3<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 3 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot4 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model4, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot4<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 4 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot5 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model5, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot5<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 5 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot6 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">autoplot</span>(model6, label <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)<span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_bw</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.text.x<span style="color:#f92672">=</span><span style="color:#a6e22e">element_blank</span>())
+<span style="color:#a6e22e">grid.arrange</span>(grobs <span style="color:#f92672">=</span> plot6<span style="color:#f92672">@</span>plots, 
+             top <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Model 6 - Diagnostic Plots for Residuals&#34;</span>)
+</code></pre></div><p><!-- raw HTML omitted --></p>
+<p>From model 1 to 6, we observe that the residuals vs fitted values become more random. A concentration of the residuals for high fitted values is clearly visible with the first model, while they seem centered around Y = 0 for model 6. Consequently, the linearity assumption holds for Model 6.</p>
+<p>The S-shaped Q-Q plot of residuals for Model 6 indicates heavy tails, or an excess of extreme values relative to the normal distribution. This can be explained by some Airbnbs having extremely high or low prices given their characteristics.</p>
+<p>There is no visible trend in the Scale-Location graph, indicating that the variability of residuals in Model 6 is constant.
+Finally, the Residuals vs Factor levels leverage graph shows that the size of residuals is the same on average for all factor levels. We still observe some extreme values, due to the presence of outliers in Airbnb prices.</p>
+<p>As a conclusion, the 4 assumptions of the linear regression model hold in our Model 6. To improve the distribution of residuals, we could include new variables, or perform a more detailed classification of the neighbourhoods.</p>
+<p>To compare the 6 models that we have created we will use huxtable to create a summary table. We also used the kableExtra package to style the summary table.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#We use huxreg from huxtable to produce a summary of all models and compare them</span>
+<span style="color:#a6e22e">huxreg</span>(model1, model2, model3, model4, model5, model6,
+       <span style="color:#75715e">#Specifying the statistics that we want to be displayed</span>
+       statistics <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#39;#observations&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;nobs&#39;</span>, 
+                      <span style="color:#e6db74">&#39;R squared&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;r.squared&#39;</span>, 
+                      <span style="color:#e6db74">&#39;Adj. R Squared&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;adj.r.squared&#39;</span>, 
+                      <span style="color:#e6db74">&#39;Residual SE&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;sigma&#39;</span>), 
+       bold_signif <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.05</span>, 
+       stars <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>
+)
+</code></pre></div><!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>We developed 6 models to forecast the price of and Airbnb apartment in Beijing. Our first, most basic model only included the type of property, number of reviews and rating as predictors and had an adjusted R squared of 7.1%.</p>
+<p>By brainstorming on the features we look at when booking an Airbnb, we added several explanatory variables, and increased the adjusted R squared to 54.7% in our latest model.</p>
+<h1 id="predicting-price">Predicting Price</h1>
+<p>To predict the price for two people staying 4 nights in Beijing, we need to first create a tibble that contains their preferences and then feed it into our model. We have chosen two tourists who want to stay in an apartment with a private room, that has breakfast, 2 bedrooms, 2 beds, 1 bathroom, and a moderate cancellation policy. The apartment is in zone 1 and has 12 reviews, a rating of 96 and accommodates 2 people.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">#Creating an imaginary tibble representing the needs of our two tourists</span>
+imaginary_Airbnb <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(room_type <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.factor</span>(<span style="color:#e6db74">&#34;Private room&#34;</span>), 
+                           prop_type_simplified <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.factor</span>(<span style="color:#e6db74">&#34;Apartment&#34;</span>), 
+                           number_of_reviews <span style="color:#f92672">=</span> <span style="color:#ae81ff">12</span>, 
+                           review_scores_rating <span style="color:#f92672">=</span> <span style="color:#ae81ff">96</span>,
+                           has_breakfast <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>,
+                           accommodates <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+                           host_is_superhost <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>,
+                           is_host_plus_4 <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>,
+                           beds <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+                           bedrooms <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+                           bathrooms <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>,
+                           cancellation_policy <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.factor</span>(<span style="color:#e6db74">&#34;moderate&#34;</span>),
+                           reviews_per_month <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+                           neighbourhood_simplified <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Zone 1&#34;</span>)
+
+<span style="color:#75715e">#Predicting price and prediction intervals</span>
+price_predicted <span style="color:#f92672">=</span> <span style="color:#a6e22e">exp</span>(<span style="color:#a6e22e">predict</span>(model6, newdata <span style="color:#f92672">=</span> imaginary_Airbnb, interval <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;prediction&#34;</span>))
+
+
+<span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;Price for two people staying four nights in Beijing is: &#34;</span>, price_predicted[1])
+</code></pre></div><pre><code>## [1] &quot;Price for two people staying four nights in Beijing is:  1365.95955064002&quot;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;Lower PI for price for two people staying four nights in Beijing  is: &#34;</span>, price_predicted[2])
+</code></pre></div><pre><code>## [1] &quot;Lower PI for price for two people staying four nights in Beijing  is:  496.765405761796&quot;
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">paste</span>(<span style="color:#e6db74">&#34;Upper PI for Price for two people staying four nights in Beijing is: &#34;</span>, price_predicted[3])
+</code></pre></div><pre><code>## [1] &quot;Upper PI for Price for two people staying four nights in Beijing is:  3755.98918995455&quot;
+</code></pre><p>After calculating the anti-log of the price that our model predicts, we find that the price comes out to be 1364.34 CNY with an upper prediction interval of 3751.73 CNY and lower prediction interval of 496.15 CNY. The wide range in prediction interval of the predicted price is due to our model having an adjusted R2 of 55% which leaves room for uncertainty.</p>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.twitter.com" class="icon alt fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+                
+                    <li><a href="https://www.facebook.com" class="icon alt fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+                
+                    <li><a href="https://www.instagram.com" class="icon alt fa-instagram" target="_blank"><span class="label">Instagram</span></a></li>
+                
+                    <li><a href="https://www.github.com" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+                    <li><a href="https://www.linkedin.com" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Company Name</li>
+                
+                <li>Design:  <a href="https://www.html5up.net">HTML5 UP</a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

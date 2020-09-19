@@ -94,7 +94,7 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "Mask Acceptance in the U.S"
       subtitle = "Do people accept mask wearing as their routine during the pandemic in the States?"
-      image = "plot_choropleths-5.png"
+      image = "pic00.jpg"
       url = "blogs/blog5"
 
     [[params.tiles.showcase]]
@@ -112,7 +112,7 @@ disqusShortname = ""
     [[params.tiles.showcase]]
       title = "AirBnB price prediction Beijing"
       subtitle = "How much does it cost for two people's four day stay for a short visit in Beijing?"
-      image = "pic04.jpg"
+      image = "pic08.jpg"
       url = "blogs/blog8"
 
    # [[params.tiles.showcase]]
